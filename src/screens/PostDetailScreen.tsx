@@ -9,7 +9,10 @@ import {
   Image,
   Share,
   Alert,
+  StatusBar,
+  Platform,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface PostDetailScreenProps {
@@ -33,6 +36,7 @@ interface PostDetailScreenProps {
 
 const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) => {
   const {post} = route.params;
+  const insets = useSafeAreaInsets();
 
   const handleShare = async () => {
     try {
@@ -61,8 +65,9 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}>
@@ -131,10 +136,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
     backgroundColor: '#FFFFFF',
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+      ios: {
+        shadowOpacity: 0,
+      },
+    }),
   },
   backButton: {
     padding: 4,

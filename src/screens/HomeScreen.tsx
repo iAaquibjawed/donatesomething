@@ -9,7 +9,9 @@ import {
   TouchableOpacity,
   Share,
   Alert,
+  Platform,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface Post {
@@ -29,6 +31,8 @@ interface HomeScreenProps {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
+  const insets = useSafeAreaInsets();
+
   const handleShare = async (post: Post) => {
     try {
       const shareMessage = `${post.userName} - ${post.content}\n\nLocation: ${post.location}\n\nShared via DonateSome`;
@@ -125,9 +129,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
         <Icon name="location-on" size={24} color="#007AFF" />
         <Text style={styles.locationText}>New York, NY</Text>
       </View>
@@ -202,10 +206,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+      ios: {
+        shadowOpacity: 0,
+      },
+    }),
   },
   locationText: {
     marginLeft: 8,
