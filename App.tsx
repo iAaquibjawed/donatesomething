@@ -8,9 +8,10 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Platform, View, Text} from 'react-native';
+import {Platform, View, Text, StatusBar} from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {ThemeProvider, useTheme} from './src/context/ThemeContext';
 import HomeScreen from './src/screens/HomeScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import NotificationScreen from './src/screens/NotificationScreen';
@@ -25,24 +26,10 @@ import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Main App Navigator (Tabs with Stack)
-function MainAppNavigator() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}>
-      <Stack.Screen name="MainTabs" component={MainTabsNavigator} />
-      <Stack.Screen name="PostDetail" component={PostDetailScreen} />
-      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-      <Stack.Screen name="CreatePost" component={CreatePostScreen} />
-    </Stack.Navigator>
-  );
-}
-
-// Tabs Navigator
+// Tabs Navigator - must be inside ThemeProvider
 function MainTabsNavigator() {
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   // This would typically come from a context or state management
   // For now, using a static value - you can make this dynamic
   const [unreadCount, setUnreadCount] = useState(3);
@@ -50,13 +37,13 @@ function MainTabsNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: colors.tabBarActive,
+        tabBarInactiveTintColor: colors.tabBarInactive,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: colors.tabBarBackground,
           borderTopWidth: 1,
-          borderTopColor: '#E5E5EA',
+          borderTopColor: colors.border,
           height: 60 + Math.max(insets.bottom, 0),
           paddingBottom: Math.max(insets.bottom, 8),
           paddingTop: 8,
@@ -67,7 +54,7 @@ function MainTabsNavigator() {
                 width: 0,
                 height: -2,
               },
-              shadowOpacity: 0.1,
+              shadowOpacity: isDark ? 0.3 : 0.1,
               shadowRadius: 4,
             },
             android: {
@@ -175,6 +162,21 @@ function MainTabsNavigator() {
   );
 }
 
+// Main App Navigator (Tabs with Stack) - must be inside ThemeProvider
+function MainAppNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <Stack.Screen name="MainTabs" component={MainTabsNavigator} />
+      <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+    </Stack.Navigator>
+  );
+}
+
 // Auth Navigator
 function AuthNavigator() {
   return (
@@ -189,11 +191,62 @@ function AuthNavigator() {
   );
 }
 
+// App component - must be inside ThemeProvider
+function AppContent(): React.JSX.Element {
+  const {isDark, colors} = useTheme();
 
-function App(): React.JSX.Element {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
+      <NavigationContainer
+        theme={{
+          dark: isDark,
+          colors: {
+            primary: colors.primary,
+            background: colors.background,
+            card: colors.surface,
+            text: colors.text,
+            border: colors.border,
+            notification: colors.primary,
+          },
+          fonts: {
+            regular: {
+              fontFamily: Platform.select({
+                ios: 'System',
+                android: 'sans-serif',
+                default: 'System',
+              }),
+              fontWeight: '400' as const,
+            },
+            medium: {
+              fontFamily: Platform.select({
+                ios: 'System',
+                android: 'sans-serif-medium',
+                default: 'System',
+              }),
+              fontWeight: '500' as const,
+            },
+            bold: {
+              fontFamily: Platform.select({
+                ios: 'System',
+                android: 'sans-serif',
+                default: 'System',
+              }),
+              fontWeight: '700' as const,
+            },
+            heavy: {
+              fontFamily: Platform.select({
+                ios: 'System',
+                android: 'sans-serif',
+                default: 'System',
+              }),
+              fontWeight: '800' as const,
+            },
+          },
+        }}>
         <Stack.Navigator
           initialRouteName="Auth"
           screenOptions={{
@@ -204,6 +257,15 @@ function App(): React.JSX.Element {
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
+  );
+}
+
+// Root App component with ThemeProvider
+function App(): React.JSX.Element {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../context/ThemeContext';
 
 interface Post {
   id: number;
@@ -34,6 +35,7 @@ interface HomeScreenProps {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   // Track which users are being followed
   const [following, setFollowing] = useState<Set<number>>(new Set());
   // Track which post's menu is open
@@ -207,12 +209,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       {/* Header */}
-      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
-        <Icon name="location-on" size={24} color="#007AFF" />
-        <Text style={styles.locationText}>New York, NY</Text>
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8), backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
+        <Icon name="location-on" size={24} color={colors.primary} />
+        <Text style={[styles.locationText, {color: colors.text}]}>New York, NY</Text>
       </View>
 
       {/* Content Feed */}
@@ -223,7 +225,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         {posts.map(post => (
           <TouchableOpacity
             key={post.id}
-            style={styles.post}
+            style={[styles.post, {backgroundColor: colors.surface, borderColor: colors.border}]}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('PostDetail', {post})}>
             {/* Post Header */}
@@ -233,7 +235,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
               </View>
               <View style={styles.userDetails}>
                 <View style={styles.userNameRow}>
-                  <Text style={styles.userName} numberOfLines={1}>
+                  <Text style={[styles.userName, {color: colors.text}]} numberOfLines={1}>
                     {post.userName}
                   </Text>
                   <TouchableOpacity
@@ -254,20 +256,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                   <TouchableOpacity
                     style={styles.moreButton}
                     onPress={e => handleMoreOptions(post.id, e)}>
-                    <Icon name="more-vert" size={20} color="#999" />
+                    <Icon name="more-vert" size={20} color={colors.textSecondary} />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.postMeta}>
-                  <Icon name="location-on" size={12} color="#999" />
-                  <Text style={styles.location}>{post.location}</Text>
-                  <Text style={styles.separator}>•</Text>
-                  <Text style={styles.timeAgo}>{post.timeAgo}</Text>
+                  <Icon name="location-on" size={12} color={colors.textSecondary} />
+                  <Text style={[styles.location, {color: colors.textSecondary}]}>{post.location}</Text>
+                  <Text style={[styles.separator, {color: colors.textSecondary}]}>•</Text>
+                  <Text style={[styles.timeAgo, {color: colors.textSecondary}]}>{post.timeAgo}</Text>
                 </View>
               </View>
             </View>
 
             {/* Post Content */}
-            <Text style={styles.postContent}>{post.content}</Text>
+            <Text style={[styles.postContent, {color: colors.text}]}>{post.content}</Text>
 
             {/* Post Image */}
             {post.image && (
@@ -288,8 +290,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                   e.stopPropagation();
                   handleShare(post);
                 }}>
-                <Icon name="share" size={24} color="#666" />
-                <Text style={styles.actionText}>Share</Text>
+                <Icon name="share" size={24} color={colors.textSecondary} />
+                <Text style={[styles.actionText, {color: colors.textSecondary}]}>Share</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
@@ -306,7 +308,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={closeMenu}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, {backgroundColor: colors.surface}]}>
             {selectedPostId && (
               <>
                 <TouchableOpacity
@@ -329,13 +331,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                       handleHidePost(selectedPostId);
                     }
                   }}>
-                  <Icon name="visibility-off" size={24} color="#666" />
-                  <Text style={styles.menuItemText}>Hide Post</Text>
+                  <Icon name="visibility-off" size={24} color={colors.textSecondary} />
+                  <Text style={[styles.menuItemText, {color: colors.text}]}>Hide Post</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.menuItem, styles.cancelItem]}
                   onPress={closeMenu}>
-                  <Text style={[styles.menuItemText, styles.cancelText]}>
+                  <Text style={[styles.menuItemText, styles.cancelText, {color: colors.text}]}>
                     Cancel
                   </Text>
                 </TouchableOpacity>
@@ -351,16 +353,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
     ...Platform.select({
       android: {
         elevation: 0,
@@ -374,7 +373,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
     fontWeight: '600',
-    color: '#000000',
   },
   feed: {
     flex: 1,
@@ -383,10 +381,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   post: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     marginBottom: 16,
     padding: 16,
+    borderWidth: 0.5,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -426,7 +424,6 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
     flexShrink: 1,
     marginRight: 8,
   },
@@ -463,7 +460,6 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 12,
-    color: '#999',
     marginLeft: 4,
   },
   separator: {
@@ -473,11 +469,9 @@ const styles = StyleSheet.create({
   },
   timeAgo: {
     fontSize: 12,
-    color: '#999',
   },
   postContent: {
     fontSize: 15,
-    color: '#000',
     lineHeight: 22,
     marginBottom: 12,
   },
@@ -506,7 +500,6 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 14,
-    color: '#666',
     marginLeft: 6,
   },
   modalOverlay: {

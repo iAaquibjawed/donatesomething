@@ -20,6 +20,7 @@ import {
   ImagePickerResponse,
   MediaType,
 } from 'react-native-image-picker';
+import {useTheme} from '../context/ThemeContext';
 
 interface CreatePostScreenProps {
   navigation: any;
@@ -38,6 +39,8 @@ const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
   navigation,
   route,
 }) => {
+  const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   // Default user data if not provided
   const defaultUserData = {
     firstName: 'User',
@@ -114,33 +117,31 @@ const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
     }
   };
 
-  const insets = useSafeAreaInsets();
-
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
         {/* Header */}
-        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
+        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8), backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}>
-            <Icon name="arrow-back" size={24} color="#000" />
+            <Icon name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Create Post</Text>
+          <Text style={[styles.headerTitle, {color: colors.text}]}>Create Post</Text>
           <TouchableOpacity onPress={handlePost} style={styles.postButton}>
             <Text style={styles.postButtonText}>Post</Text>
           </TouchableOpacity>
         </View>
 
         <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          style={[styles.scrollView, {backgroundColor: colors.background}]}
+          contentContainerStyle={[styles.scrollContent, {paddingBottom: Math.max(insets.bottom, 0) + 20}]}
           showsVerticalScrollIndicator={false}>
           {/* User Info */}
-          <View style={styles.userSection}>
+          <View style={[styles.userSection, {backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
             <View style={styles.userInfo}>
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>
@@ -149,21 +150,21 @@ const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
                 </Text>
               </View>
               <View style={styles.userDetails}>
-                <Text style={styles.userName}>
+                <Text style={[styles.userName, {color: colors.text}]}>
                   {userData.firstName} {userData.lastName}
                 </Text>
-                <Text style={styles.userType}>Food Provider</Text>
+                <Text style={[styles.userType, {color: colors.textSecondary}]}>Food Provider</Text>
               </View>
             </View>
           </View>
 
           {/* Content Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.label}>What food are you providing? *</Text>
+          <View style={[styles.inputSection, {backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
+            <Text style={[styles.label, {color: colors.text}]}>What food are you providing? *</Text>
             <TextInput
-              style={styles.contentInput}
+              style={[styles.contentInput, {backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border}]}
               placeholder="Describe the food you have available (e.g., Fresh vegetables, cooked meals, canned goods, etc.)"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.placeholder}
               value={content}
               onChangeText={text => {
                 setContent(text);
@@ -179,14 +180,14 @@ const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
           </View>
 
           {/* Location Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.label}>Location *</Text>
-            <View style={styles.inputWrapper}>
-              <Icon name="location-on" size={20} color="#666" style={styles.icon} />
+          <View style={[styles.inputSection, {backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
+            <Text style={[styles.label, {color: colors.text}]}>Location *</Text>
+            <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+              <Icon name="location-on" size={20} color={colors.textSecondary} style={styles.icon} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, {color: colors.text}]}
                 placeholder="Enter location (e.g., New York, NY)"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.placeholder}
                 value={location}
                 onChangeText={text => {
                   setLocation(text);
@@ -201,16 +202,16 @@ const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
 
           {/* Image Section */}
           <View style={styles.imageSection}>
-            <Text style={styles.label}>Add Photo (Optional)</Text>
+            <Text style={[styles.label, {color: colors.text}]}>Add Photo (Optional)</Text>
             <TouchableOpacity
-              style={styles.imagePickerButton}
+              style={[styles.imagePickerButton, {borderColor: colors.border}]}
               onPress={handleImagePicker}>
               {postImage ? (
                 <Image source={{uri: postImage}} style={styles.previewImage} />
               ) : (
-                <View style={styles.imagePlaceholder}>
-                  <Icon name="add-photo-alternate" size={48} color="#999" />
-                  <Text style={styles.imagePlaceholderText}>
+                <View style={[styles.imagePlaceholder, {backgroundColor: colors.inputBackground}]}>
+                  <Icon name="add-photo-alternate" size={48} color={colors.textSecondary} />
+                  <Text style={[styles.imagePlaceholderText, {color: colors.textSecondary}]}>
                     Tap to add photo
                   </Text>
                 </View>
@@ -233,7 +234,6 @@ const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   keyboardView: {
     flex: 1,
@@ -244,7 +244,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
     ...Platform.select({
@@ -265,7 +264,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
   },
   postButton: {
     padding: 4,
@@ -282,10 +280,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   userSection: {
-    backgroundColor: '#FFFFFF',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
   },
   userInfo: {
     flexDirection: 'row',
@@ -311,43 +307,33 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 4,
   },
   userType: {
     fontSize: 12,
-    color: '#666',
   },
   inputSection: {
-    backgroundColor: '#FFFFFF',
     padding: 16,
     marginTop: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 12,
   },
   contentInput: {
     minHeight: 120,
     fontSize: 16,
-    color: '#000',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 12,
     padding: 12,
-    backgroundColor: '#F9F9F9',
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 12,
-    backgroundColor: '#F9F9F9',
     paddingHorizontal: 12,
   },
   icon: {

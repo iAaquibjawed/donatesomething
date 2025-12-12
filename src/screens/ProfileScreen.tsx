@@ -10,6 +10,7 @@ import {
   Alert,
   StatusBar,
   Platform,
+  Switch,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -18,6 +19,7 @@ import {
   ImagePickerResponse,
   MediaType,
 } from 'react-native-image-picker';
+import {useTheme} from '../context/ThemeContext';
 
 interface ProfileScreenProps {
   navigation: any;
@@ -26,6 +28,7 @@ interface ProfileScreenProps {
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
+  const {colors, isDark, themeMode, setThemeMode} = useTheme();
 
   // Dummy user data - in a real app, this would come from state management or API
   const [userData, setUserData] = useState({
@@ -96,19 +99,19 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[styles.scrollContent, {paddingBottom: Math.max(insets.bottom, 0) + 80}]}
         showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
-          <Text style={styles.headerTitle}>Profile</Text>
+        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8), backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
+          <Text style={[styles.headerTitle, {color: colors.text}]}>Profile</Text>
         </View>
 
         {/* Profile Image Section */}
-        <View style={styles.profileImageSection}>
+        <View style={[styles.profileImageSection, {backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
           <View style={styles.imageContainer}>
             {userData.profileImage ? (
               <Image
@@ -136,14 +139,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
         </View>
 
         {/* User Info Section */}
-        <View style={styles.infoSection}>
+        <View style={[styles.infoSection, {backgroundColor: colors.surface}]}>
           {/* Name */}
           <View style={styles.infoCard}>
             <View style={styles.infoHeader}>
-              <Icon name="person" size={20} color="#007AFF" />
-              <Text style={styles.infoLabel}>Full Name</Text>
+              <Icon name="person" size={20} color={colors.primary} />
+              <Text style={[styles.infoLabel, {color: colors.textSecondary}]}>Full Name</Text>
             </View>
-            <Text style={styles.infoValue}>
+            <Text style={[styles.infoValue, {color: colors.text}]}>
               {userData.firstName} {userData.lastName}
             </Text>
           </View>
@@ -151,19 +154,19 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
           {/* Email */}
           <View style={styles.infoCard}>
             <View style={styles.infoHeader}>
-              <Icon name="email" size={20} color="#007AFF" />
-              <Text style={styles.infoLabel}>Email</Text>
+              <Icon name="email" size={20} color={colors.primary} />
+              <Text style={[styles.infoLabel, {color: colors.textSecondary}]}>Email</Text>
             </View>
-            <Text style={styles.infoValue}>{userData.email}</Text>
+            <Text style={[styles.infoValue, {color: colors.text}]}>{userData.email}</Text>
           </View>
 
           {/* Phone */}
           <View style={styles.infoCard}>
             <View style={styles.infoHeader}>
-              <Icon name="phone" size={20} color="#007AFF" />
-              <Text style={styles.infoLabel}>Phone Number</Text>
+              <Icon name="phone" size={20} color={colors.primary} />
+              <Text style={[styles.infoLabel, {color: colors.textSecondary}]}>Phone Number</Text>
             </View>
-            <Text style={styles.infoValue}>
+            <Text style={[styles.infoValue, {color: colors.text}]}>
               {userData.phone || 'Not provided'}
             </Text>
           </View>
@@ -178,12 +181,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
                     : 'volunteer-activism'
                 }
                 size={20}
-                color="#007AFF"
+                color={colors.primary}
               />
-              <Text style={styles.infoLabel}>Account Type</Text>
+              <Text style={[styles.infoLabel, {color: colors.textSecondary}]}>Account Type</Text>
             </View>
             <View style={styles.accountTypeBadge}>
-              <Text style={styles.accountTypeText}>
+              <Text style={[styles.accountTypeText, {color: colors.primary}]}>
                 {userData.accountType === 'want'
                   ? 'I Want Food'
                   : 'I Provide Food'}
@@ -194,9 +197,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
 
         {/* My Posts Section - Only for Food Providers */}
         {userData.accountType === 'provide' && (
-          <View style={styles.myPostsSection}>
+          <View style={[styles.myPostsSection, {backgroundColor: colors.surface}]}>
             <View style={styles.myPostsHeader}>
-              <Text style={styles.myPostsTitle}>My Posts</Text>
+              <Text style={[styles.myPostsTitle, {color: colors.text}]}>My Posts</Text>
               <TouchableOpacity
                 style={styles.createPostButton}
                 onPress={() =>
@@ -212,7 +215,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
                 {myPosts.map(post => (
                   <TouchableOpacity
                     key={post.id}
-                    style={styles.postCard}
+                    style={[styles.postCard, {backgroundColor: colors.cardBackground, borderColor: colors.border}]}
                     onPress={() =>
                       navigation.navigate('PostDetail', {
                         post: {
@@ -226,16 +229,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
                     }>
                     <View style={styles.postCardHeader}>
                       <View style={styles.postCardContent}>
-                        <Text style={styles.postCardText} numberOfLines={2}>
+                        <Text style={[styles.postCardText, {color: colors.text}]} numberOfLines={2}>
                           {post.content}
                         </Text>
                         <View style={styles.postCardMeta}>
-                          <Icon name="location-on" size={12} color="#999" />
-                          <Text style={styles.postCardLocation}>
+                          <Icon name="location-on" size={12} color={colors.textSecondary} />
+                          <Text style={[styles.postCardLocation, {color: colors.textSecondary}]}>
                             {post.location}
                           </Text>
-                          <Text style={styles.postCardSeparator}>•</Text>
-                          <Text style={styles.postCardTime}>{post.timeAgo}</Text>
+                          <Text style={[styles.postCardSeparator, {color: colors.textSecondary}]}>•</Text>
+                          <Text style={[styles.postCardTime, {color: colors.textSecondary}]}>{post.timeAgo}</Text>
                         </View>
                       </View>
                       {post.image ? (
@@ -254,11 +257,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
               </View>
             ) : (
               <View style={styles.emptyPostsContainer}>
-                <Icon name="article" size={48} color="#CCC" />
-                <Text style={styles.emptyPostsText}>
+                <Icon name="article" size={48} color={colors.textSecondary} />
+                <Text style={[styles.emptyPostsText, {color: colors.text}]}>
                   You haven't created any posts yet
                 </Text>
-                <Text style={styles.emptyPostsSubtext}>
+                <Text style={[styles.emptyPostsSubtext, {color: colors.textSecondary}]}>
                   Tap "Create Post" to share food you're providing
                 </Text>
               </View>
@@ -267,29 +270,83 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
         )}
 
         {/* Action Buttons */}
-        <View style={styles.actionsSection}>
+        <View style={[styles.actionsSection, {backgroundColor: colors.surface}]}>
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, {borderBottomColor: colors.border}]}
             onPress={() => navigation.navigate('EditProfile', {userData})}>
-            <Icon name="edit" size={20} color="#007AFF" />
-            <Text style={styles.actionButtonText}>Edit Profile</Text>
-            <Icon name="chevron-right" size={24} color="#999" />
+            <Icon name="edit" size={20} color={colors.primary} />
+            <Text style={[styles.actionButtonText, {color: colors.text}]}>Edit Profile</Text>
+            <Icon name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <Icon name="settings" size={20} color="#007AFF" />
-            <Text style={styles.actionButtonText}>Settings</Text>
-            <Icon name="chevron-right" size={24} color="#999" />
+          <TouchableOpacity style={[styles.actionButton, {borderBottomColor: colors.border}]}>
+            <Icon name="settings" size={20} color={colors.primary} />
+            <Text style={[styles.actionButtonText, {color: colors.text}]}>Settings</Text>
+            <Icon name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
 
+          <View style={[styles.actionButton, styles.darkModeButton, {borderBottomColor: colors.border}]}>
+            <Icon name="dark-mode" size={20} color={colors.primary} />
+            <Text style={[styles.actionButtonText, {color: colors.text, flex: 1}]}>
+              Dark Mode
+            </Text>
+            <View style={styles.darkModeOptions}>
+              <TouchableOpacity
+                style={[
+                  styles.themeOption,
+                  {backgroundColor: themeMode === 'system' ? colors.primary : colors.inputBackground},
+                  themeMode === 'system' && {borderColor: colors.primary},
+                ]}
+                onPress={() => setThemeMode('system')}>
+                <Text
+                  style={[
+                    styles.themeOptionText,
+                    {color: themeMode === 'system' ? '#FFFFFF' : colors.textSecondary},
+                  ]}>
+                  System
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.themeOption,
+                  {backgroundColor: themeMode === 'light' ? colors.primary : colors.inputBackground},
+                  themeMode === 'light' && {borderColor: colors.primary},
+                ]}
+                onPress={() => setThemeMode('light')}>
+                <Text
+                  style={[
+                    styles.themeOptionText,
+                    {color: themeMode === 'light' ? '#FFFFFF' : colors.textSecondary},
+                  ]}>
+                  Light
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.themeOption,
+                  {backgroundColor: themeMode === 'dark' ? colors.primary : colors.inputBackground},
+                  themeMode === 'dark' && {borderColor: colors.primary},
+                ]}
+                onPress={() => setThemeMode('dark')}>
+                <Text
+                  style={[
+                    styles.themeOptionText,
+                    {color: themeMode === 'dark' ? '#FFFFFF' : colors.textSecondary},
+                  ]}>
+                  Dark
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <TouchableOpacity style={styles.actionButton}>
-            <Icon name="help-outline" size={20} color="#007AFF" />
-            <Text style={styles.actionButtonText}>Help & Support</Text>
-            <Icon name="chevron-right" size={24} color="#999" />
+            <Icon name="help-outline" size={20} color={colors.primary} />
+            <Text style={[styles.actionButtonText, {color: colors.text}]}>Help & Support</Text>
+            <Icon name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.logoutButton]}
+            style={[styles.actionButton, styles.logoutButton, {borderBottomColor: colors.border}]}
             onPress={() => {
               Alert.alert(
                 'Logout',
@@ -441,14 +498,12 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
     marginLeft: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   infoValue: {
     fontSize: 16,
-    color: '#000',
     fontWeight: '500',
     marginLeft: 28,
   },
@@ -463,6 +518,26 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
+    paddingHorizontal: 20,
+  },
+  darkModeButton: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  darkModeOptions: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  themeOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  themeOptionText: {
+    fontSize: 12,
+    fontWeight: '500',
   },
   actionButtonText: {
     flex: 1,
@@ -483,16 +558,13 @@ const styles = StyleSheet.create({
   },
   accountTypeText: {
     fontSize: 16,
-    color: '#007AFF',
     fontWeight: '600',
-    backgroundColor: '#F0F8FF',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     alignSelf: 'flex-start',
   },
   myPostsSection: {
-    backgroundColor: '#FFFFFF',
     marginBottom: 20,
     padding: 16,
   },
@@ -505,7 +577,6 @@ const styles = StyleSheet.create({
   myPostsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#000',
   },
   createPostButton: {
     flexDirection: 'row',
@@ -525,11 +596,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   postCard: {
-    backgroundColor: '#F9F9F9',
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
   },
   postCardHeader: {
     flexDirection: 'row',
@@ -540,7 +609,6 @@ const styles = StyleSheet.create({
   },
   postCardText: {
     fontSize: 14,
-    color: '#000',
     marginBottom: 8,
     lineHeight: 20,
   },
@@ -550,7 +618,6 @@ const styles = StyleSheet.create({
   },
   postCardLocation: {
     fontSize: 12,
-    color: '#999',
     marginLeft: 4,
   },
   postCardSeparator: {
@@ -560,7 +627,6 @@ const styles = StyleSheet.create({
   },
   postCardTime: {
     fontSize: 12,
-    color: '#999',
   },
   postCardImage: {
     width: 60,
@@ -583,13 +649,11 @@ const styles = StyleSheet.create({
   emptyPostsText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
     marginTop: 16,
     marginBottom: 8,
   },
   emptyPostsSubtext: {
     fontSize: 14,
-    color: '#666',
     textAlign: 'center',
   },
 });

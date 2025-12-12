@@ -20,6 +20,7 @@ import {
   ImagePickerResponse,
   MediaType,
 } from 'react-native-image-picker';
+import {useTheme} from '../context/ThemeContext';
 
 interface EditProfileScreenProps {
   route: {
@@ -42,6 +43,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
   navigation,
 }) => {
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   const {userData: initialUserData} = route.params;
 
   const [firstName, setFirstName] = useState(initialUserData.firstName);
@@ -59,7 +61,6 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
     lastName: '',
     email: '',
     phone: '',
-    accountType: '',
   });
 
   const validateEmail = (email: string): boolean => {
@@ -99,7 +100,6 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
       lastName: '',
       email: '',
       phone: '',
-      accountType: '',
     };
 
     if (!firstName.trim()) {
@@ -143,30 +143,30 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
         {/* Header */}
-        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
+        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8), backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}>
-            <Icon name="arrow-back" size={24} color="#000" />
+            <Icon name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Profile</Text>
+          <Text style={[styles.headerTitle, {color: colors.text}]}>Edit Profile</Text>
           <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>Save</Text>
+            <Text style={[styles.saveButtonText, {color: colors.primary}]}>Save</Text>
           </TouchableOpacity>
         </View>
 
         <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          style={[styles.scrollView, {backgroundColor: colors.background}]}
+          contentContainerStyle={[styles.scrollContent, {paddingBottom: Math.max(insets.bottom, 0) + 20}]}
           showsVerticalScrollIndicator={false}>
           {/* Profile Image Section */}
-          <View style={styles.profileImageSection}>
+          <View style={[styles.profileImageSection, {backgroundColor: colors.surface}]}>
             <View style={styles.imageContainer}>
               {profileImage ? (
                 <Image
@@ -174,8 +174,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
                   style={styles.profileImage}
                 />
               ) : (
-                <View style={styles.placeholderImage}>
-                  <Icon name="person" size={60} color="#999" />
+                <View style={[styles.placeholderImage, {backgroundColor: colors.inputBackground}]}>
+                  <Icon name="person" size={60} color={colors.textSecondary} />
                 </View>
               )}
               <TouchableOpacity
@@ -187,23 +187,23 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
             <TouchableOpacity
               style={styles.changePhotoButton}
               onPress={handleImagePicker}>
-              <Text style={styles.changePhotoText}>
+              <Text style={[styles.changePhotoText, {color: colors.primary}]}>
                 {profileImage ? 'Change Photo' : 'Add Photo'}
               </Text>
             </TouchableOpacity>
           </View>
 
           {/* Form Fields */}
-          <View style={styles.formSection}>
+          <View style={[styles.formSection, {backgroundColor: colors.surface}]}>
             {/* First Name */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>First Name</Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="person" size={20} color="#666" style={styles.icon} />
+              <Text style={[styles.label, {color: colors.text}]}>First Name</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="person" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your first name"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={firstName}
                   onChangeText={text => {
                     setFirstName(text);
@@ -219,13 +219,13 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
 
             {/* Last Name */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Last Name</Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="person" size={20} color="#666" style={styles.icon} />
+              <Text style={[styles.label, {color: colors.text}]}>Last Name</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="person" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your last name"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={lastName}
                   onChangeText={text => {
                     setLastName(text);
@@ -241,13 +241,13 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
 
             {/* Email */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="email" size={20} color="#666" style={styles.icon} />
+              <Text style={[styles.label, {color: colors.text}]}>Email</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="email" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your email"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={email}
                   onChangeText={text => {
                     setEmail(text);
@@ -265,15 +265,15 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
 
             {/* Phone */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>
-                Phone Number <Text style={styles.optional}>(Optional)</Text>
+              <Text style={[styles.label, {color: colors.text}]}>
+                Phone Number <Text style={[styles.optional, {color: colors.textSecondary}]}>(Optional)</Text>
               </Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="phone" size={20} color="#666" style={styles.icon} />
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="phone" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your phone number"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={phone}
                   onChangeText={text => {
                     setPhone(text);
@@ -287,100 +287,23 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
               ) : null}
             </View>
 
-            {/* Account Type */}
+            {/* Account Type - Read Only */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Account Type</Text>
-              <Text style={styles.subLabel}>
-                Are you looking for food or providing food?
-              </Text>
-              <View style={styles.accountTypeContainer}>
-                <TouchableOpacity
-                  style={[
-                    styles.accountTypeOption,
-                    accountType === 'want' && styles.accountTypeOptionSelected,
-                  ]}
-                  onPress={() => {
-                    setAccountType('want');
-                    if (errors.accountType)
-                      setErrors({...errors, accountType: ''});
-                  }}>
-                  <View
-                    style={[
-                      styles.radioButton,
-                      accountType === 'want' && styles.radioButtonSelected,
-                    ]}>
-                    {accountType === 'want' && (
-                      <View style={styles.radioButtonInner} />
-                    )}
-                  </View>
-                  <View style={styles.accountTypeContent}>
-                    <Icon
-                      name="restaurant"
-                      size={24}
-                      color={accountType === 'want' ? '#007AFF' : '#666'}
-                    />
-                    <View style={styles.accountTypeTextContainer}>
-                      <Text
-                        style={[
-                          styles.accountTypeTitle,
-                          accountType === 'want' &&
-                            styles.accountTypeTitleSelected,
-                        ]}>
-                        I Want Food
-                      </Text>
-                      <Text style={styles.accountTypeDescription}>
-                        Looking for food assistance
-                      </Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[
-                    styles.accountTypeOption,
-                    accountType === 'provide' &&
-                      styles.accountTypeOptionSelected,
-                  ]}
-                  onPress={() => {
-                    setAccountType('provide');
-                    if (errors.accountType)
-                      setErrors({...errors, accountType: ''});
-                  }}>
-                  <View
-                    style={[
-                      styles.radioButton,
-                      accountType === 'provide' &&
-                        styles.radioButtonSelected,
-                    ]}>
-                    {accountType === 'provide' && (
-                      <View style={styles.radioButtonInner} />
-                    )}
-                  </View>
-                  <View style={styles.accountTypeContent}>
-                    <Icon
-                      name="volunteer-activism"
-                      size={24}
-                      color={accountType === 'provide' ? '#007AFF' : '#666'}
-                    />
-                    <View style={styles.accountTypeTextContainer}>
-                      <Text
-                        style={[
-                          styles.accountTypeTitle,
-                          accountType === 'provide' &&
-                            styles.accountTypeTitleSelected,
-                        ]}>
-                        I Provide Food
-                      </Text>
-                      <Text style={styles.accountTypeDescription}>
-                        Donating or providing food
-                      </Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+              <Text style={[styles.label, {color: colors.text}]}>Account Type</Text>
+              <View style={[styles.accountTypeDisplay, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon
+                  name={accountType === 'want' ? 'restaurant' : 'volunteer-activism'}
+                  size={24}
+                  color={colors.primary}
+                />
+                <Text style={[styles.accountTypeDisplayText, {color: colors.text}]}>
+                  {accountType === 'want' ? 'I Want Food' : 'I Provide Food'}
+                </Text>
+                <Icon name="lock" size={16} color={colors.textSecondary} style={{marginLeft: 'auto'}} />
               </View>
-              {errors.accountType ? (
-                <Text style={styles.errorText}>{errors.accountType}</Text>
-              ) : null}
+              <Text style={[styles.subLabel, {color: colors.textSecondary, marginTop: 8}]}>
+                Account type cannot be changed after signup
+              </Text>
             </View>
           </View>
         </ScrollView>
@@ -392,7 +315,6 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   keyboardView: {
     flex: 1,
@@ -403,9 +325,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
     ...Platform.select({
       android: {
         elevation: 0,
@@ -421,7 +341,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
   },
   saveButton: {
     padding: 4,
@@ -429,7 +348,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#007AFF',
   },
   scrollView: {
     flex: 1,
@@ -438,12 +356,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   profileImageSection: {
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     paddingVertical: 30,
     marginBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
   },
   imageContainer: {
     position: 'relative',
@@ -459,7 +375,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#F0F0F0',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -480,15 +395,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#F0F8FF',
   },
   changePhotoText: {
-    color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
   },
   formSection: {
-    backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
@@ -498,21 +410,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 8,
   },
   optional: {
     fontWeight: '400',
-    color: '#999',
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 12,
-    backgroundColor: '#F9F9F9',
     paddingHorizontal: 12,
+    height: 50,
   },
   icon: {
     marginRight: 8,
@@ -521,7 +430,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#000',
   },
   errorText: {
     color: '#FF3B30',
@@ -531,67 +439,22 @@ const styles = StyleSheet.create({
   },
   subLabel: {
     fontSize: 12,
-    color: '#666',
     marginBottom: 12,
     marginTop: 4,
   },
-  accountTypeContainer: {
-    marginTop: 8,
-  },
-  accountTypeOption: {
+  accountTypeDisplay: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderWidth: 1,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 12,
-    backgroundColor: '#F9F9F9',
+    marginTop: 8,
   },
-  accountTypeOptionSelected: {
-    borderColor: '#007AFF',
-    backgroundColor: '#F0F8FF',
-  },
-  radioButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#999',
-    marginRight: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioButtonSelected: {
-    borderColor: '#007AFF',
-  },
-  radioButtonInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#007AFF',
-  },
-  accountTypeContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  accountTypeTextContainer: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  accountTypeTitle: {
+  accountTypeDisplayText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
-    marginBottom: 4,
-  },
-  accountTypeTitleSelected: {
-    color: '#007AFF',
-  },
-  accountTypeDescription: {
-    fontSize: 12,
-    color: '#666',
+    marginLeft: 12,
+    flex: 1,
   },
 });
 
