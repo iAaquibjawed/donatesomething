@@ -166,7 +166,7 @@ const SearchScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       {/* Search Header */}
       <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
@@ -195,7 +195,7 @@ const SearchScreen = () => {
       {!isSearching ? (
         <ScrollView
           style={styles.content}
-          contentContainerStyle={styles.contentContainer}>
+          contentContainerStyle={[styles.contentContainer, {paddingBottom: Math.max(insets.bottom, 0) + 80}]}>
           {/* Recent Searches */}
           {recentSearches.length > 0 && (
             <View style={styles.section}>
@@ -273,7 +273,7 @@ const SearchScreen = () => {
               data={searchResults}
               renderItem={renderSearchResult}
               keyExtractor={item => item.id.toString()}
-              contentContainerStyle={styles.resultsList}
+              contentContainerStyle={[styles.resultsList, {paddingBottom: Math.max(insets.bottom, 0) + 80}]}
               showsVerticalScrollIndicator={false}
             />
           ) : (

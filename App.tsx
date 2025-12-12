@@ -3,15 +3,16 @@
  * @format
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Platform} from 'react-native';
+import {Platform, View, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import HomeScreen from './src/screens/HomeScreen';
 import SearchScreen from './src/screens/SearchScreen';
+import NotificationScreen from './src/screens/NotificationScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import PostDetailScreen from './src/screens/PostDetailScreen';
@@ -39,6 +40,9 @@ function MainAppNavigator() {
 // Tabs Navigator
 function MainTabsNavigator() {
   const insets = useSafeAreaInsets();
+  // This would typically come from a context or state management
+  // For now, using a static value - you can make this dynamic
+  const [unreadCount, setUnreadCount] = useState(3);
 
   return (
     <Tab.Navigator
@@ -50,8 +54,14 @@ function MainTabsNavigator() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E5EA',
-          height: 60 + Math.max(insets.bottom, 0),
-          paddingBottom: Math.max(insets.bottom, 8),
+          height: Platform.select({
+            ios: 60 + Math.max(insets.bottom, 0),
+            android: 65 + Math.max(insets.bottom, 16),
+          }),
+          paddingBottom: Platform.select({
+            ios: Math.max(insets.bottom, 0),
+            android: Math.max(insets.bottom, 16),
+          }),
           paddingTop: 8,
           ...Platform.select({
             ios: {
@@ -71,13 +81,15 @@ function MainTabsNavigator() {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
-          marginTop: 4,
+          marginTop: 2,
+          marginBottom: 0,
         },
         tabBarIconStyle: {
-          marginTop: 4,
+          marginTop: 0,
+          marginBottom: 0,
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
+          paddingVertical: 6,
         },
       }}>
       <Tab.Screen
@@ -98,6 +110,44 @@ function MainTabsNavigator() {
             <Icon name="search" size={24} color={color} />
           ),
           tabBarLabel: 'Search',
+        }}
+      />
+      <Tab.Screen
+        name="Notifications"
+        component={NotificationScreen}
+        options={{
+          tabBarIcon: ({color, size, focused}) => (
+            <View style={{position: 'relative', width: 24, height: 24}}>
+              <Icon name="notifications" size={24} color={color} />
+              {unreadCount > 0 && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -6,
+                    right: -8,
+                    backgroundColor: '#FF3B30',
+                    borderRadius: unreadCount > 9 ? 8 : 9,
+                    minWidth: unreadCount > 9 ? 18 : 18,
+                    height: 18,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: unreadCount > 9 ? 4 : 0,
+                    borderWidth: 2,
+                    borderColor: '#FFFFFF',
+                  }}>
+                  <Text
+                    style={{
+                      color: '#FFF',
+                      fontSize: 10,
+                      fontWeight: 'bold',
+                    }}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </Text>
+                </View>
+              )}
+            </View>
+          ),
+          tabBarLabel: 'Notifications',
         }}
       />
       <Tab.Screen
