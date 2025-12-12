@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,12 @@ import {
   MediaType,
 } from 'react-native-image-picker';
 
-const ProfileScreen = () => {
+interface ProfileScreenProps {
+  navigation: any;
+  route?: any;
+}
+
+const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
   // Dummy user data - in a real app, this would come from state management or API
   const [userData, setUserData] = useState({
     firstName: 'John',
@@ -25,6 +30,13 @@ const ProfileScreen = () => {
     phone: '+1 234 567 8900',
     profileImage: null as string | null,
   });
+
+  // Update user data if coming from EditProfileScreen
+  useEffect(() => {
+    if (route?.params?.updatedUserData) {
+      setUserData(route.params.updatedUserData);
+    }
+  }, [route?.params?.updatedUserData]);
 
   const handleImagePicker = () => {
     const options = {
@@ -125,7 +137,9 @@ const ProfileScreen = () => {
 
         {/* Action Buttons */}
         <View style={styles.actionsSection}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('EditProfile', {userData})}>
             <Icon name="edit" size={20} color="#007AFF" />
             <Text style={styles.actionButtonText}>Edit Profile</Text>
             <Icon name="chevron-right" size={24} color="#999" />
