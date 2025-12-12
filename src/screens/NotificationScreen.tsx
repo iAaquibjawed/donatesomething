@@ -172,7 +172,7 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       {/* Header */}
       <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
@@ -187,7 +187,7 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
       {/* Notifications List */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, {paddingBottom: Math.max(insets.bottom, 0) + 80}]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

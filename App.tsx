@@ -54,8 +54,14 @@ function MainTabsNavigator() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E5EA',
-          height: 60 + Math.max(insets.bottom, 0),
-          paddingBottom: Math.max(insets.bottom, 8),
+          height: Platform.select({
+            ios: 60 + Math.max(insets.bottom, 0),
+            android: 65 + Math.max(insets.bottom, 16),
+          }),
+          paddingBottom: Platform.select({
+            ios: Math.max(insets.bottom, 0),
+            android: Math.max(insets.bottom, 16),
+          }),
           paddingTop: 8,
           ...Platform.select({
             ios: {
@@ -75,13 +81,15 @@ function MainTabsNavigator() {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
-          marginTop: 4,
+          marginTop: 2,
+          marginBottom: 0,
         },
         tabBarIconStyle: {
-          marginTop: 4,
+          marginTop: 0,
+          marginBottom: 0,
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
+          paddingVertical: 6,
         },
       }}>
       <Tab.Screen
