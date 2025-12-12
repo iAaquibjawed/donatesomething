@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -32,6 +32,24 @@ interface HomeScreenProps {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const insets = useSafeAreaInsets();
+  // Track which users are being followed
+  const [following, setFollowing] = useState<Set<number>>(new Set());
+
+  const handleFollow = (postId: number, userName: string, e: any) => {
+    e.stopPropagation(); // Prevent navigation when clicking follow button
+
+    setFollowing(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+        Alert.alert('Unfollowed', `You unfollowed ${userName}`);
+      } else {
+        newSet.add(postId);
+        Alert.alert('Following', `You are now following ${userName}`);
+      }
+      return newSet;
+    });
+  };
 
   const handleShare = async (post: Post) => {
     try {
@@ -149,23 +167,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
             onPress={() => navigation.navigate('PostDetail', {post})}>
             {/* Post Header */}
             <View style={styles.postHeader}>
-              <View style={styles.userInfo}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{post.userAvatar}</Text>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{post.userAvatar}</Text>
+              </View>
+              <View style={styles.userDetails}>
+                <View style={styles.userNameRow}>
+                  <Text style={styles.userName} numberOfLines={1}>
+                    {post.userName}
+                  </Text>
+                  <TouchableOpacity
+                    style={[
+                      styles.followButton,
+                      following.has(post.id) && styles.followingButton,
+                    ]}
+                    onPress={e => handleFollow(post.id, post.userName, e)}
+                    activeOpacity={0.7}>
+                    <Text
+                      style={[
+                        styles.followButtonText,
+                        following.has(post.id) && styles.followingButtonText,
+                      ]}>
+                      {following.has(post.id) ? 'Following' : 'Follow'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.moreButton}>
+                    <Icon name="more-vert" size={20} color="#999" />
+                  </TouchableOpacity>
                 </View>
-                <View style={styles.userDetails}>
-                  <Text style={styles.userName}>{post.userName}</Text>
-                  <View style={styles.postMeta}>
-                    <Icon name="location-on" size={12} color="#999" />
-                    <Text style={styles.location}>{post.location}</Text>
-                    <Text style={styles.separator}>•</Text>
-                    <Text style={styles.timeAgo}>{post.timeAgo}</Text>
-                  </View>
+                <View style={styles.postMeta}>
+                  <Icon name="location-on" size={12} color="#999" />
+                  <Text style={styles.location}>{post.location}</Text>
+                  <Text style={styles.separator}>•</Text>
+                  <Text style={styles.timeAgo}>{post.timeAgo}</Text>
                 </View>
               </View>
-              <TouchableOpacity>
-                <Icon name="more-vert" size={20} color="#999" />
-              </TouchableOpacity>
             </View>
 
             {/* Post Content */}
@@ -247,14 +282,8 @@ const styles = StyleSheet.create({
   },
   postHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 12,
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
   },
   avatar: {
     width: 48,
@@ -270,12 +299,47 @@ const styles = StyleSheet.create({
   },
   userDetails: {
     flex: 1,
+    minWidth: 0, // Allows flex shrinking
+  },
+  userNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    flexShrink: 1,
   },
   userName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000',
-    marginBottom: 4,
+    flexShrink: 1,
+    marginRight: 8,
+  },
+  followButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
+    backgroundColor: '#007AFF',
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    marginRight: 8,
+    flexShrink: 0,
+  },
+  moreButton: {
+    padding: 4,
+    marginLeft: 'auto',
+    flexShrink: 0,
+  },
+  followingButton: {
+    backgroundColor: '#F0F0F0',
+    borderColor: '#E0E0E0',
+  },
+  followButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  followingButtonText: {
+    color: '#666',
   },
   postMeta: {
     flexDirection: 'row',
