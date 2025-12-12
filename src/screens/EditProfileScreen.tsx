@@ -31,6 +31,7 @@ interface EditProfileScreenProps {
         email: string;
         phone: string;
         profileImage: string | null;
+        backgroundImage: string | null;
         accountType: 'want' | 'provide';
       };
     };
@@ -55,6 +56,9 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
   );
   const [profileImage, setProfileImage] = useState<string | null>(
     initialUserData.profileImage,
+  );
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(
+    initialUserData.backgroundImage || null,
   );
   const [errors, setErrors] = useState({
     firstName: '',
@@ -90,6 +94,27 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
         return;
       } else if (response.assets && response.assets[0]) {
         setProfileImage(response.assets[0].uri || null);
+      }
+    });
+  };
+
+  const handleBackgroundImagePicker = () => {
+    const options = {
+      mediaType: 'photo' as MediaType,
+      quality: 0.8,
+      maxWidth: 1200,
+      maxHeight: 400,
+      includeBase64: false,
+    };
+
+    launchImageLibrary(options, (response: ImagePickerResponse) => {
+      if (response.didCancel) {
+        return;
+      } else if (response.errorCode) {
+        Alert.alert('Error', response.errorMessage || 'Failed to pick image');
+        return;
+      } else if (response.assets && response.assets[0]) {
+        setBackgroundImage(response.assets[0].uri || null);
       }
     });
   };
@@ -134,6 +159,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
             email,
             phone,
             profileImage,
+            backgroundImage,
             accountType,
           },
         },
@@ -165,32 +191,57 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
           style={[styles.scrollView, {backgroundColor: colors.background}]}
           contentContainerStyle={[styles.scrollContent, {paddingBottom: Math.max(insets.bottom, 0) + 20}]}
           showsVerticalScrollIndicator={false}>
-          {/* Profile Image Section */}
-          <View style={[styles.profileImageSection, {backgroundColor: colors.surface}]}>
-            <View style={styles.imageContainer}>
-              {profileImage ? (
+          {/* Profile Image Section with Background */}
+          <View style={[styles.profileImageSection, {borderBottomColor: colors.border}]}>
+            {/* Background Image */}
+            <View style={styles.backgroundImageContainer}>
+              {backgroundImage ? (
                 <Image
-                  source={{uri: profileImage}}
-                  style={styles.profileImage}
+                  source={{uri: backgroundImage}}
+                  style={styles.backgroundImage}
                 />
               ) : (
-                <View style={[styles.placeholderImage, {backgroundColor: colors.inputBackground}]}>
-                  <Icon name="person" size={60} color={colors.textSecondary} />
+                <View style={[styles.backgroundImagePlaceholder, {backgroundColor: colors.inputBackground}]}>
+                  <Icon name="image" size={48} color={colors.textSecondary} />
                 </View>
               )}
               <TouchableOpacity
-                style={styles.editImageButton}
-                onPress={handleImagePicker}>
-                <Icon name="camera-alt" size={20} color="#FFF" />
+                style={[styles.editBackgroundButton, {backgroundColor: colors.primary}]}
+                onPress={handleBackgroundImagePicker}>
+                <Icon name="camera-alt" size={18} color="#FFF" />
+                <Text style={styles.editBackgroundButtonText}>
+                  {backgroundImage ? 'Change Background' : 'Add Background'}
+                </Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.changePhotoButton}
-              onPress={handleImagePicker}>
-              <Text style={[styles.changePhotoText, {color: colors.primary}]}>
-                {profileImage ? 'Change Photo' : 'Add Photo'}
-              </Text>
-            </TouchableOpacity>
+
+            {/* Profile Image on top */}
+            <View style={styles.profileImageContent}>
+              <View style={styles.imageContainer}>
+                {profileImage ? (
+                  <Image
+                    source={{uri: profileImage}}
+                    style={styles.profileImage}
+                  />
+                ) : (
+                  <View style={[styles.placeholderImage, {backgroundColor: colors.surface}]}>
+                    <Icon name="person" size={60} color={colors.textSecondary} />
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={[styles.editImageButton, {backgroundColor: colors.primary}]}
+                  onPress={handleImagePicker}>
+                  <Icon name="camera-alt" size={20} color="#FFF" />
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={[styles.changePhotoButton, {backgroundColor: colors.primary + '20'}]}
+                onPress={handleImagePicker}>
+                <Text style={[styles.changePhotoText, {color: colors.primary}]}>
+                  {profileImage ? 'Change Photo' : 'Add Photo'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Form Fields */}
@@ -356,10 +407,54 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   profileImageSection: {
-    alignItems: 'center',
-    paddingVertical: 30,
+    position: 'relative',
+    width: '100%',
     marginBottom: 20,
     borderBottomWidth: 1,
+    overflow: 'hidden',
+  },
+  backgroundImageContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 200,
+    width: '100%',
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  backgroundImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editBackgroundButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#007AFF',
+  },
+  editBackgroundButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  profileImageContent: {
+    alignItems: 'center',
+    paddingTop: 120,
+    paddingBottom: 30,
+    position: 'relative',
+    zIndex: 1,
   },
   imageContainer: {
     position: 'relative',

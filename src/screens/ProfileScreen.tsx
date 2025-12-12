@@ -38,7 +38,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     lastName: 'Doe',
     email: 'john.doe@example.com',
     phone: '+1 234 567 8900',
-    profileImage: null as string | null,
+    profileImage: 'https://randomuser.me/api/portraits/men/32.jpg' as string | null,
+    backgroundImage: 'https://source.unsplash.com/1200x400/?nature,landscape' as string | null,
     accountType: 'provide' as 'want' | 'provide',
   });
 
@@ -107,6 +108,36 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     });
   };
 
+  const handleBackgroundImagePicker = () => {
+    const options = {
+      mediaType: 'photo' as MediaType,
+      quality: 0.8,
+      maxWidth: 1200,
+      maxHeight: 400,
+      includeBase64: false,
+    };
+
+    launchImageLibrary(options, (response: ImagePickerResponse) => {
+      if (response.didCancel) {
+        return;
+      } else if (response.errorCode) {
+        Alert.alert('Error', response.errorMessage || 'Failed to pick image');
+        return;
+      } else if (response.assets && response.assets[0]) {
+        setUserData({
+          ...userData,
+          backgroundImage: response.assets[0].uri || null,
+        });
+      }
+    });
+  };
+
+  // Debug: Log image URLs
+  React.useEffect(() => {
+    console.log('Profile Image URL:', userData.profileImage);
+    console.log('Background Image URL:', userData.backgroundImage);
+  }, [userData.profileImage, userData.backgroundImage]);
+
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
@@ -119,32 +150,74 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
           <Text style={[styles.headerTitle, {color: colors.text}]}>Profile</Text>
         </View>
 
-        {/* Profile Image Section */}
-        <View style={[styles.profileImageSection, {backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
-          <View style={styles.imageContainer}>
-            {userData.profileImage ? (
-              <Image
-                source={{uri: userData.profileImage}}
-                style={styles.profileImage}
-              />
+        {/* Profile Image Section with Background */}
+        <View style={[styles.profileImageSection, {borderBottomColor: colors.border}]}>
+          {/* Background Image */}
+          <View style={[styles.backgroundImageContainer, {backgroundColor: colors.inputBackground}]}>
+            {userData.backgroundImage ? (
+              <>
+                <Image
+                  source={{uri: userData.backgroundImage}}
+                  style={styles.backgroundImage}
+                  resizeMode="cover"
+                  onError={(error) => {
+                    console.log('Background image error:', error.nativeEvent?.error || error);
+                  }}
+                  onLoad={() => {
+                    console.log('Background image loaded successfully');
+                  }}
+                />
+                <View style={styles.backgroundImageOverlay} />
+              </>
             ) : (
-              <View style={styles.placeholderImage}>
-                <Icon name="person" size={60} color="#999" />
+              <View style={[styles.backgroundImagePlaceholder, {backgroundColor: colors.inputBackground}]}>
+                <Icon name="image" size={48} color={colors.textSecondary} />
               </View>
             )}
             <TouchableOpacity
-              style={styles.editImageButton}
-              onPress={handleImagePicker}>
-              <Icon name="camera-alt" size={20} color="#FFF" />
+              style={[styles.editBackgroundButton, {backgroundColor: colors.primary}]}
+              onPress={handleBackgroundImagePicker}>
+              <Icon name="camera-alt" size={18} color="#FFF" />
+              <Text style={styles.editBackgroundButtonText}>
+                {userData.backgroundImage ? 'Change Background' : 'Add Background'}
+              </Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.uploadButton}
-            onPress={handleImagePicker}>
-            <Text style={styles.uploadButtonText}>
-              {userData.profileImage ? 'Change Photo' : 'Upload Photo'}
-            </Text>
-          </TouchableOpacity>
+
+          {/* Profile Image on top */}
+          <View style={styles.profileImageContent}>
+            <View style={styles.imageContainer}>
+              {userData.profileImage ? (
+                <Image
+                  source={{uri: userData.profileImage}}
+                  style={styles.profileImage}
+                  resizeMode="cover"
+                  onError={(error) => {
+                    console.log('Profile image error:', error.nativeEvent.error);
+                  }}
+                  onLoad={() => {
+                    console.log('Profile image loaded successfully');
+                  }}
+                />
+              ) : (
+                <View style={[styles.placeholderImage, {backgroundColor: colors.surface}]}>
+                  <Icon name="person" size={60} color={colors.textSecondary} />
+                </View>
+              )}
+              <TouchableOpacity
+                style={[styles.editImageButton, {backgroundColor: colors.primary}]}
+                onPress={handleImagePicker}>
+                <Icon name="camera-alt" size={20} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              style={[styles.uploadButton, {backgroundColor: colors.primary + '20'}]}
+              onPress={handleImagePicker}>
+              <Text style={[styles.uploadButtonText, {color: colors.primary}]}>
+                {userData.profileImage ? 'Change Photo' : 'Upload Photo'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* User Info Section */}
@@ -476,12 +549,62 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   profileImageSection: {
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    paddingVertical: 30,
+    position: 'relative',
+    width: '100%',
     marginBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
+    overflow: 'hidden',
+  },
+  backgroundImageContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 200,
+    width: '100%',
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+  },
+  backgroundImageOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  backgroundImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editBackgroundButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#007AFF',
+  },
+  editBackgroundButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  profileImageContent: {
+    alignItems: 'center',
+    paddingTop: 120,
+    paddingBottom: 30,
+    position: 'relative',
+    zIndex: 1,
   },
   imageContainer: {
     position: 'relative',
