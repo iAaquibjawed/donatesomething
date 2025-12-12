@@ -7,6 +7,8 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
+  Share,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -27,6 +29,31 @@ interface HomeScreenProps {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
+  const handleShare = async (post: Post) => {
+    try {
+      const shareMessage = `${post.userName} - ${post.content}\n\nLocation: ${post.location}\n\nShared via DonateSome`;
+      const result = await Share.share({
+        message: shareMessage,
+        title: 'Share Post',
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // Shared with activity type of result.activityType
+          console.log('Shared with', result.activityType);
+        } else {
+          // Shared
+          console.log('Post shared successfully');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // Dismissed
+        console.log('Share dismissed');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to share post');
+    }
+  };
+
   const posts: Post[] = [
     {
       id: 1,
@@ -153,22 +180,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                 style={styles.actionButton}
                 onPress={e => {
                   e.stopPropagation();
-                }}>
-                <Icon name="favorite-border" size={24} color="#666" />
-                <Text style={styles.actionText}>{post.likes}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={e => {
-                  e.stopPropagation();
-                }}>
-                <Icon name="chat-bubble-outline" size={24} color="#666" />
-                <Text style={styles.actionText}>{post.comments}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={e => {
-                  e.stopPropagation();
+                  handleShare(post);
                 }}>
                 <Icon name="share" size={24} color="#666" />
                 <Text style={styles.actionText}>Share</Text>
