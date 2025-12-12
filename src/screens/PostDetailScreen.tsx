@@ -7,6 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Share,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -32,6 +34,31 @@ interface PostDetailScreenProps {
 const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) => {
   const {post} = route.params;
 
+  const handleShare = async () => {
+    try {
+      const shareMessage = `${post.userName} - ${post.content}\n\nLocation: ${post.location}\n\nShared via DonateSome`;
+      const result = await Share.share({
+        message: shareMessage,
+        title: 'Share Post',
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // Shared with activity type of result.activityType
+          console.log('Shared with', result.activityType);
+        } else {
+          // Shared
+          console.log('Post shared successfully');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // Dismissed
+        console.log('Share dismissed');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to share post');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -42,7 +69,7 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
           <Icon name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Post Details</Text>
-        <TouchableOpacity style={styles.shareButton}>
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
           <Icon name="share" size={24} color="#007AFF" />
         </TouchableOpacity>
       </View>
@@ -84,7 +111,7 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
 
         {/* Action Buttons */}
         <View style={styles.actionsSection}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
             <Icon name="share" size={24} color="#666" />
             <Text style={styles.actionText}>Share</Text>
           </TouchableOpacity>
