@@ -38,8 +38,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     lastName: 'Doe',
     email: 'john.doe@example.com',
     phone: '+1 234 567 8900',
-    profileImage: 'https://randomuser.me/api/portraits/men/32.jpg' as string | null,
-    backgroundImage: 'https://source.unsplash.com/1200x400/?nature,landscape' as string | null,
+    profileImage: 'https://i.pravatar.cc/300?img=12' as string | null,
+    backgroundImage: 'https://picsum.photos/1200/400' as string | null,
     accountType: 'provide' as 'want' | 'provide',
   });
 
@@ -109,6 +109,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
   };
 
   const handleBackgroundImagePicker = () => {
+    console.log('Background image picker triggered');
     const options = {
       mediaType: 'photo' as MediaType,
       quality: 0.8,
@@ -118,16 +119,22 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     };
 
     launchImageLibrary(options, (response: ImagePickerResponse) => {
+      console.log('Image picker response:', response);
       if (response.didCancel) {
+        console.log('User cancelled image picker');
         return;
       } else if (response.errorCode) {
+        console.log('Image picker error:', response.errorCode, response.errorMessage);
         Alert.alert('Error', response.errorMessage || 'Failed to pick image');
         return;
       } else if (response.assets && response.assets[0]) {
-        setUserData({
-          ...userData,
+        console.log('Image selected:', response.assets[0].uri);
+        setUserData(prev => ({
+          ...prev,
           backgroundImage: response.assets[0].uri || null,
-        });
+        }));
+      } else {
+        console.log('No image selected');
       }
     });
   };
@@ -162,6 +169,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
                   resizeMode="cover"
                   onError={(error) => {
                     console.log('Background image error:', error.nativeEvent?.error || error);
+                    // Fallback to placeholder on error
+                    setUserData(prev => ({...prev, backgroundImage: null}));
                   }}
                   onLoad={() => {
                     console.log('Background image loaded successfully');
@@ -175,9 +184,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
               </View>
             )}
             <TouchableOpacity
-              style={[styles.editBackgroundButton, {backgroundColor: colors.primary}]}
-              onPress={handleBackgroundImagePicker}>
-              <Icon name="camera-alt" size={18} color="#FFF" />
+              style={[styles.editBackgroundButton, {backgroundColor: colors.primary + 'D9'}]}
+              onPress={handleBackgroundImagePicker}
+              activeOpacity={0.8}>
+              <Icon name="camera-alt" size={12} color="#FFF" />
               <Text style={styles.editBackgroundButtonText}>
                 {userData.backgroundImage ? 'Change Background' : 'Add Background'}
               </Text>
@@ -193,7 +203,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
                   style={styles.profileImage}
                   resizeMode="cover"
                   onError={(error) => {
-                    console.log('Profile image error:', error.nativeEvent.error);
+                    console.log('Profile image error:', error.nativeEvent?.error || error);
+                    // Fallback to placeholder on error
+                    setUserData(prev => ({...prev, profileImage: null}));
                   }}
                   onLoad={() => {
                     console.log('Profile image loaded successfully');
@@ -575,6 +587,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    zIndex: 1,
   },
   backgroundImagePlaceholder: {
     width: '100%',
@@ -584,31 +597,36 @@ const styles = StyleSheet.create({
   },
   editBackgroundButton: {
     position: 'absolute',
-    bottom: 16,
-    right: 16,
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 0,
+    backgroundColor: 'rgba(0, 122, 255, 0.85)',
+    zIndex: 1,
+    elevation: 2,
   },
   editBackgroundButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 6,
+    fontSize: 12,
+    fontWeight: '500',
+    marginLeft: 4,
   },
   profileImageContent: {
     alignItems: 'center',
     paddingTop: 120,
     paddingBottom: 30,
     position: 'relative',
-    zIndex: 1,
+    zIndex: 2,
   },
   imageContainer: {
     position: 'relative',
     marginBottom: 16,
+    zIndex: 3,
   },
   profileImage: {
     width: 120,

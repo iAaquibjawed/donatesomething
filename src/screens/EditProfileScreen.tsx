@@ -206,9 +206,10 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
                 </View>
               )}
               <TouchableOpacity
-                style={[styles.editBackgroundButton, {backgroundColor: colors.primary}]}
-                onPress={handleBackgroundImagePicker}>
-                <Icon name="camera-alt" size={18} color="#FFF" />
+                style={[styles.editBackgroundButton, {backgroundColor: colors.primary + 'D9'}]}
+                onPress={handleBackgroundImagePicker}
+                activeOpacity={0.8}>
+                <Icon name="camera-alt" size={12} color="#FFF" />
                 <Text style={styles.editBackgroundButtonText}>
                   {backgroundImage ? 'Change Background' : 'Add Background'}
                 </Text>
@@ -434,31 +435,36 @@ const styles = StyleSheet.create({
   },
   editBackgroundButton: {
     position: 'absolute',
-    bottom: 16,
-    right: 16,
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 0,
+    backgroundColor: 'rgba(0, 122, 255, 0.85)',
+    zIndex: 1,
+    elevation: 2,
   },
   editBackgroundButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 6,
+    fontSize: 12,
+    fontWeight: '500',
+    marginLeft: 4,
   },
   profileImageContent: {
     alignItems: 'center',
     paddingTop: 120,
     paddingBottom: 30,
     position: 'relative',
-    zIndex: 1,
+    zIndex: 2,
   },
   imageContainer: {
     position: 'relative',
     marginBottom: 16,
+    zIndex: 3,
   },
   profileImage: {
     width: 120,
