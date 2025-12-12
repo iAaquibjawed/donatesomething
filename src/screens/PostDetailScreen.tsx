@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -31,13 +31,6 @@ interface PostDetailScreenProps {
 
 const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) => {
   const {post} = route.params;
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.likes);
-
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount(prev => (isLiked ? prev - 1 : prev + 1));
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -89,104 +82,11 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
           <Text style={styles.postContent}>{post.content}</Text>
         </View>
 
-        {/* Engagement Stats */}
-        <View style={styles.statsSection}>
-          <View style={styles.statItem}>
-            <Icon name="favorite" size={20} color="#FF3B30" />
-            <Text style={styles.statText}>{likeCount} likes</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Icon name="chat-bubble" size={20} color="#007AFF" />
-            <Text style={styles.statText}>{post.comments} comments</Text>
-          </View>
-        </View>
-
         {/* Action Buttons */}
         <View style={styles.actionsSection}>
-          <TouchableOpacity
-            style={[styles.actionButton, isLiked && styles.actionButtonActive]}
-            onPress={handleLike}>
-            <Icon
-              name={isLiked ? 'favorite' : 'favorite-border'}
-              size={24}
-              color={isLiked ? '#FF3B30' : '#666'}
-            />
-            <Text
-              style={[
-                styles.actionText,
-                isLiked && styles.actionTextActive,
-              ]}>
-              Like
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
-            <Icon name="chat-bubble-outline" size={24} color="#666" />
-            <Text style={styles.actionText}>Comment</Text>
-          </TouchableOpacity>
-
           <TouchableOpacity style={styles.actionButton}>
             <Icon name="share" size={24} color="#666" />
             <Text style={styles.actionText}>Share</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Comments Section */}
-        <View style={styles.commentsSection}>
-          <View style={styles.commentsHeader}>
-            <Text style={styles.commentsTitle}>Comments ({post.comments})</Text>
-          </View>
-
-          {/* Dummy Comments */}
-          <View style={styles.commentItem}>
-            <View style={styles.commentAvatar}>
-              <Text style={styles.commentAvatarText}>👤</Text>
-            </View>
-            <View style={styles.commentContent}>
-              <Text style={styles.commentAuthor}>Alex Thompson</Text>
-              <Text style={styles.commentText}>
-                Great initiative! How can I help?
-              </Text>
-              <Text style={styles.commentTime}>2 hours ago</Text>
-            </View>
-          </View>
-
-          <View style={styles.commentItem}>
-            <View style={styles.commentAvatar}>
-              <Text style={styles.commentAvatarText}>👤</Text>
-            </View>
-            <View style={styles.commentContent}>
-              <Text style={styles.commentAuthor}>Maria Garcia</Text>
-              <Text style={styles.commentText}>
-                I'd love to volunteer! Where can I sign up?
-              </Text>
-              <Text style={styles.commentTime}>5 hours ago</Text>
-            </View>
-          </View>
-
-          <View style={styles.commentItem}>
-            <View style={styles.commentAvatar}>
-              <Text style={styles.commentAvatarText}>👤</Text>
-            </View>
-            <View style={styles.commentContent}>
-              <Text style={styles.commentAuthor}>James Wilson</Text>
-              <Text style={styles.commentText}>
-                This is amazing! Keep up the good work! 🙌
-              </Text>
-              <Text style={styles.commentTime}>1 day ago</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Add Comment Input */}
-        <View style={styles.addCommentSection}>
-          <View style={styles.addCommentInput}>
-            <Text style={styles.addCommentPlaceholder}>
-              Add a comment...
-            </Text>
-          </View>
-          <TouchableOpacity style={styles.sendButton}>
-            <Icon name="send" size={20} color="#007AFF" />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -301,23 +201,6 @@ const styles = StyleSheet.create({
     color: '#000',
     lineHeight: 24,
   },
-  statsSection: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 24,
-  },
-  statText: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 6,
-  },
   actionsSection: {
     flexDirection: 'row',
     paddingHorizontal: 16,
@@ -328,90 +211,12 @@ const styles = StyleSheet.create({
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 24,
     paddingVertical: 4,
-  },
-  actionButtonActive: {
-    // Active state styling
   },
   actionText: {
     fontSize: 16,
     color: '#666',
     marginLeft: 6,
-  },
-  actionTextActive: {
-    color: '#FF3B30',
-    fontWeight: '600',
-  },
-  commentsSection: {
-    padding: 16,
-  },
-  commentsHeader: {
-    marginBottom: 16,
-  },
-  commentsTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-  },
-  commentItem: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  commentAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F0F0F0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  commentAvatarText: {
-    fontSize: 18,
-  },
-  commentContent: {
-    flex: 1,
-  },
-  commentAuthor: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 4,
-  },
-  commentText: {
-    fontSize: 14,
-    color: '#000',
-    lineHeight: 20,
-    marginBottom: 4,
-  },
-  commentTime: {
-    fontSize: 12,
-    color: '#999',
-  },
-  addCommentSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-    marginTop: 8,
-  },
-  addCommentInput: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginRight: 8,
-  },
-  addCommentPlaceholder: {
-    fontSize: 14,
-    color: '#999',
-  },
-  sendButton: {
-    padding: 8,
   },
 });
 

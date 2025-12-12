@@ -24,6 +24,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [accountType, setAccountType] = useState<'want' | 'provide' | ''>('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({
@@ -33,6 +34,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
     phone: '',
     password: '',
     confirmPassword: '',
+    accountType: '',
   });
 
   const validateEmail = (email: string): boolean => {
@@ -53,6 +55,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
       phone: '',
       password: '',
       confirmPassword: '',
+      accountType: '',
     };
 
     if (!firstName.trim()) {
@@ -83,6 +86,10 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    if (!accountType) {
+      newErrors.accountType = 'Please select an account type';
     }
 
     setErrors(newErrors);
@@ -205,6 +212,102 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
               </View>
               {errors.phone ? (
                 <Text style={styles.errorText}>{errors.phone}</Text>
+              ) : null}
+            </View>
+
+            {/* Account Type */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Account Type *</Text>
+              <Text style={styles.subLabel}>
+                Are you looking for food or providing food?
+              </Text>
+              <View style={styles.accountTypeContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.accountTypeOption,
+                    accountType === 'want' && styles.accountTypeOptionSelected,
+                  ]}
+                  onPress={() => {
+                    setAccountType('want');
+                    if (errors.accountType)
+                      setErrors({...errors, accountType: ''});
+                  }}>
+                  <View
+                    style={[
+                      styles.radioButton,
+                      accountType === 'want' && styles.radioButtonSelected,
+                    ]}>
+                    {accountType === 'want' && (
+                      <View style={styles.radioButtonInner} />
+                    )}
+                  </View>
+                  <View style={styles.accountTypeContent}>
+                    <Icon
+                      name="restaurant"
+                      size={24}
+                      color={accountType === 'want' ? '#007AFF' : '#666'}
+                    />
+                    <View style={styles.accountTypeTextContainer}>
+                      <Text
+                        style={[
+                          styles.accountTypeTitle,
+                          accountType === 'want' &&
+                            styles.accountTypeTitleSelected,
+                        ]}>
+                        I Want Food
+                      </Text>
+                      <Text style={styles.accountTypeDescription}>
+                        Looking for food assistance
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.accountTypeOption,
+                    accountType === 'provide' &&
+                      styles.accountTypeOptionSelected,
+                  ]}
+                  onPress={() => {
+                    setAccountType('provide');
+                    if (errors.accountType)
+                      setErrors({...errors, accountType: ''});
+                  }}>
+                  <View
+                    style={[
+                      styles.radioButton,
+                      accountType === 'provide' &&
+                        styles.radioButtonSelected,
+                    ]}>
+                    {accountType === 'provide' && (
+                      <View style={styles.radioButtonInner} />
+                    )}
+                  </View>
+                  <View style={styles.accountTypeContent}>
+                    <Icon
+                      name="volunteer-activism"
+                      size={24}
+                      color={accountType === 'provide' ? '#007AFF' : '#666'}
+                    />
+                    <View style={styles.accountTypeTextContainer}>
+                      <Text
+                        style={[
+                          styles.accountTypeTitle,
+                          accountType === 'provide' &&
+                            styles.accountTypeTitleSelected,
+                        ]}>
+                        I Provide Food
+                      </Text>
+                      <Text style={styles.accountTypeDescription}>
+                        Donating or providing food
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              {errors.accountType ? (
+                <Text style={styles.errorText}>{errors.accountType}</Text>
               ) : null}
             </View>
 
@@ -409,6 +512,70 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
+  },
+  subLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 12,
+    marginTop: 4,
+  },
+  accountTypeContainer: {
+    marginTop: 8,
+  },
+  accountTypeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    backgroundColor: '#F9F9F9',
+  },
+  accountTypeOptionSelected: {
+    borderColor: '#007AFF',
+    backgroundColor: '#F0F8FF',
+  },
+  radioButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#999',
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioButtonSelected: {
+    borderColor: '#007AFF',
+  },
+  radioButtonInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#007AFF',
+  },
+  accountTypeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  accountTypeTextContainer: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  accountTypeTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 4,
+  },
+  accountTypeTitleSelected: {
+    color: '#007AFF',
+  },
+  accountTypeDescription: {
+    fontSize: 12,
+    color: '#666',
   },
 });
 
