@@ -189,10 +189,6 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
     }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(notif => ({...notif, isRead: true})));
-  };
-
   const onRefresh = () => {
     setRefreshing(true);
     // Simulate refresh
@@ -201,19 +197,12 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
     }, 1000);
   };
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
-
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       {/* Header */}
       <View style={[styles.header, {paddingTop: Math.max(insets.top, 16), backgroundColor: colors.headerBackground, borderBottomColor: colors.border}]}>
         <Text style={[styles.headerTitle, {color: colors.text}]}>Notifications</Text>
-        {unreadCount > 0 && (
-          <TouchableOpacity onPress={markAllAsRead} style={styles.markAllButton}>
-            <Text style={[styles.markAllText, {color: colors.primary}]}>Mark all as read</Text>
-          </TouchableOpacity>
-        )}
       </View>
 
       {/* Notifications List */}
@@ -333,15 +322,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-  },
-  markAllButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  markAllText: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '600',
   },
   scrollView: {
     flex: 1,
