@@ -154,22 +154,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                 onPress={e => {
                   e.stopPropagation();
                 }}>
-                <Icon name="favorite-border" size={24} color="#666" />
-                <Text style={styles.actionText}>{post.likes}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={e => {
-                  e.stopPropagation();
-                }}>
-                <Icon name="chat-bubble-outline" size={24} color="#666" />
-                <Text style={styles.actionText}>{post.comments}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={e => {
-                  e.stopPropagation();
-                }}>
                 <Icon name="share" size={24} color="#666" />
                 <Text style={styles.actionText}>Share</Text>
               </TouchableOpacity>
@@ -293,6 +277,7 @@ const styles = StyleSheet.create({
   postActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#F0F0F0',
@@ -300,7 +285,6 @@ const styles = StyleSheet.create({
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 24,
   },
   actionText: {
     fontSize: 14,
