@@ -305,6 +305,7 @@ const styles = StyleSheet.create({
   postActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#F0F0F0',
@@ -312,7 +313,6 @@ const styles = StyleSheet.create({
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 24,
   },
   actionText: {
     fontSize: 14,
