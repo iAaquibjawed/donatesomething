@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../context/ThemeContext';
+import {useUser} from '../context/UserContext';
 
 interface Post {
   id: number;
@@ -30,29 +32,31 @@ interface Post {
 
 interface HomeScreenProps {
   navigation: any;
+  route?: {
+    params?: {
+      accountType?: 'want' | 'provide';
+      following?: Set<string>;
+    };
+  };
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
-  // Track which users are being followed
-  const [following, setFollowing] = useState<Set<number>>(new Set());
+  const {colors, isDark} = useTheme();
+  const {accountType: currentAccountType, following, addFollowing, removeFollowing} = useUser();
   // Track which post's menu is open
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
-  const handleFollow = (postId: number, userName: string, e: any) => {
+  const handleFollow = (userName: string, e: any) => {
     e.stopPropagation(); // Prevent navigation when clicking follow button
 
-    setFollowing(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-        Alert.alert('Unfollowed', `You unfollowed ${userName}`);
-      } else {
-        newSet.add(postId);
-        Alert.alert('Following', `You are now following ${userName}`);
-      }
-      return newSet;
-    });
+    if (following.has(userName)) {
+      removeFollowing(userName);
+      Alert.alert('Unfollowed', `You unfollowed ${userName}`);
+    } else {
+      addFollowing(userName);
+      Alert.alert('Following', `You are now following ${userName}`);
+    }
   };
 
   const handleShare = async (post: Post) => {
@@ -131,7 +135,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     setSelectedPostId(null);
   };
 
-  const posts: Post[] = [
+  const allPosts: Post[] = [
     {
       id: 1,
       userName: 'Sarah Johnson',
@@ -206,13 +210,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     },
   ];
 
+  // Filter posts based on account type
+  // For "I Want Food" users: only show posts from users they're following
+  // For "I Provide Food" users: show all posts
+  const posts =
+    currentAccountType === 'want'
+      ? allPosts.filter(post => following.has(post.userName))
+      : allPosts;
+
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       {/* Header */}
-      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
-        <Icon name="location-on" size={24} color="#007AFF" />
-        <Text style={styles.locationText}>New York, NY</Text>
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8), backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
+        <Icon name="location-on" size={24} color={colors.primary} />
+        <Text style={[styles.locationText, {color: colors.text}]}>New York, NY</Text>
       </View>
 
       {/* Content Feed */}
@@ -220,10 +232,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         style={styles.feed}
         contentContainerStyle={[styles.feedContent, {paddingBottom: Math.max(insets.bottom, 0) + 80}]}
         showsVerticalScrollIndicator={false}>
-        {posts.map(post => (
+        {currentAccountType === 'want' && following.size === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Icon name="people-outline" size={64} color={colors.textSecondary} />
+            <Text style={[styles.emptyText, {color: colors.text}]}>No posts to show</Text>
+            <Text style={[styles.emptySubtext, {color: colors.textSecondary}]}>
+              Start following food providers to see their posts
+            </Text>
+          </View>
+        ) : posts.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Icon name="article" size={64} color={colors.textSecondary} />
+            <Text style={[styles.emptyText, {color: colors.text}]}>No posts available</Text>
+          </View>
+        ) : (
+          posts.map(post => (
           <TouchableOpacity
             key={post.id}
-            style={styles.post}
+            style={[styles.post, {backgroundColor: colors.surface, borderColor: colors.border}]}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('PostDetail', {post})}>
             {/* Post Header */}
@@ -233,41 +259,43 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
               </View>
               <View style={styles.userDetails}>
                 <View style={styles.userNameRow}>
-                  <Text style={styles.userName} numberOfLines={1}>
+                  <Text style={[styles.userName, {color: colors.text}]} numberOfLines={1}>
                     {post.userName}
                   </Text>
-                  <TouchableOpacity
-                    style={[
-                      styles.followButton,
-                      following.has(post.id) && styles.followingButton,
-                    ]}
-                    onPress={e => handleFollow(post.id, post.userName, e)}
-                    activeOpacity={0.7}>
-                    <Text
+                  {currentAccountType === 'want' && (
+                    <TouchableOpacity
                       style={[
-                        styles.followButtonText,
-                        following.has(post.id) && styles.followingButtonText,
-                      ]}>
-                      {following.has(post.id) ? 'Following' : 'Follow'}
-                    </Text>
-                  </TouchableOpacity>
+                        styles.followButton,
+                        following.has(post.userName) && styles.followingButton,
+                      ]}
+                      onPress={e => handleFollow(post.userName, e)}
+                      activeOpacity={0.7}>
+                      <Text
+                        style={[
+                          styles.followButtonText,
+                          following.has(post.userName) && styles.followingButtonText,
+                        ]}>
+                        {following.has(post.userName) ? 'Following' : 'Follow'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity
                     style={styles.moreButton}
                     onPress={e => handleMoreOptions(post.id, e)}>
-                    <Icon name="more-vert" size={20} color="#999" />
+                    <Icon name="more-vert" size={20} color={colors.textSecondary} />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.postMeta}>
-                  <Icon name="location-on" size={12} color="#999" />
-                  <Text style={styles.location}>{post.location}</Text>
-                  <Text style={styles.separator}>•</Text>
-                  <Text style={styles.timeAgo}>{post.timeAgo}</Text>
+                  <Icon name="location-on" size={12} color={colors.textSecondary} />
+                  <Text style={[styles.location, {color: colors.textSecondary}]}>{post.location}</Text>
+                  <Text style={[styles.separator, {color: colors.textSecondary}]}>•</Text>
+                  <Text style={[styles.timeAgo, {color: colors.textSecondary}]}>{post.timeAgo}</Text>
                 </View>
               </View>
             </View>
 
             {/* Post Content */}
-            <Text style={styles.postContent}>{post.content}</Text>
+            <Text style={[styles.postContent, {color: colors.text}]}>{post.content}</Text>
 
             {/* Post Image */}
             {post.image && (
@@ -288,12 +316,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                   e.stopPropagation();
                   handleShare(post);
                 }}>
-                <Icon name="share" size={24} color="#666" />
-                <Text style={styles.actionText}>Share</Text>
+                <Icon name="share" size={24} color={colors.textSecondary} />
+                <Text style={[styles.actionText, {color: colors.textSecondary}]}>Share</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
-        ))}
+          ))
+        )}
       </ScrollView>
 
       {/* Post Options Modal */}
@@ -306,7 +335,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={closeMenu}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, {backgroundColor: colors.surface}]}>
             {selectedPostId && (
               <>
                 <TouchableOpacity
@@ -329,13 +358,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                       handleHidePost(selectedPostId);
                     }
                   }}>
-                  <Icon name="visibility-off" size={24} color="#666" />
-                  <Text style={styles.menuItemText}>Hide Post</Text>
+                  <Icon name="visibility-off" size={24} color={colors.textSecondary} />
+                  <Text style={[styles.menuItemText, {color: colors.text}]}>Hide Post</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.menuItem, styles.cancelItem]}
                   onPress={closeMenu}>
-                  <Text style={[styles.menuItemText, styles.cancelText]}>
+                  <Text style={[styles.menuItemText, styles.cancelText, {color: colors.text}]}>
                     Cancel
                   </Text>
                 </TouchableOpacity>
@@ -351,16 +380,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
     ...Platform.select({
       android: {
         elevation: 0,
@@ -374,7 +400,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
     fontWeight: '600',
-    color: '#000000',
   },
   feed: {
     flex: 1,
@@ -383,10 +408,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   post: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     marginBottom: 16,
     padding: 16,
+    borderWidth: 0.5,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -426,7 +451,6 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
     flexShrink: 1,
     marginRight: 8,
   },
@@ -463,7 +487,6 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 12,
-    color: '#999',
     marginLeft: 4,
   },
   separator: {
@@ -473,11 +496,9 @@ const styles = StyleSheet.create({
   },
   timeAgo: {
     fontSize: 12,
-    color: '#999',
   },
   postContent: {
     fontSize: 15,
-    color: '#000',
     lineHeight: 22,
     marginBottom: 12,
   },
@@ -506,8 +527,22 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 14,
-    color: '#666',
     marginLeft: 6,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,

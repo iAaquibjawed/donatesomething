@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../context/ThemeContext';
 
 interface PostDetailScreenProps {
   route: {
@@ -38,6 +39,7 @@ interface PostDetailScreenProps {
 const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) => {
   const {post} = route.params;
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   const [showMenu, setShowMenu] = useState(false);
 
   const handleShare = async () => {
@@ -91,45 +93,45 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       {/* Header */}
-      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8), backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color="#000" />
+          <Icon name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Post Details</Text>
+        <Text style={[styles.headerTitle, {color: colors.text}]}>Post Details</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-            <Icon name="share" size={24} color="#007AFF" />
+            <Icon name="share" size={24} color={colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.moreButton}
             onPress={() => setShowMenu(true)}>
-            <Icon name="more-vert" size={24} color="#666" />
+            <Icon name="more-vert" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        style={[styles.scrollView, {backgroundColor: colors.surface}]}
+        contentContainerStyle={[styles.scrollContent, {flexGrow: 1, paddingBottom: Math.max(insets.bottom, 0) + 20, backgroundColor: colors.surface}]}
         showsVerticalScrollIndicator={false}>
         {/* User Info */}
-        <View style={styles.userSection}>
+        <View style={[styles.userSection, {backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
           <View style={styles.userInfo}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>{post.userAvatar}</Text>
             </View>
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{post.userName}</Text>
+              <Text style={[styles.userName, {color: colors.text}]}>{post.userName}</Text>
               <View style={styles.postMeta}>
-                <Icon name="location-on" size={14} color="#999" />
-                <Text style={styles.location}>{post.location}</Text>
-                <Text style={styles.separator}>•</Text>
-                <Text style={styles.timeAgo}>{post.timeAgo}</Text>
+                <Icon name="location-on" size={14} color={colors.textSecondary} />
+                <Text style={[styles.location, {color: colors.textSecondary}]}>{post.location}</Text>
+                <Text style={[styles.separator, {color: colors.textSecondary}]}>•</Text>
+                <Text style={[styles.timeAgo, {color: colors.textSecondary}]}>{post.timeAgo}</Text>
               </View>
             </View>
           </View>
@@ -146,23 +148,23 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
           </View>
         ) : (
           <View style={styles.imageContainer}>
-            <View style={styles.postImagePlaceholder}>
-              <Icon name="image" size={60} color="#CCC" />
-              <Text style={styles.imagePlaceholderText}>Post Image</Text>
+            <View style={[styles.postImagePlaceholder, {backgroundColor: colors.inputBackground}]}>
+              <Icon name="image" size={60} color={colors.textSecondary} />
+              <Text style={[styles.imagePlaceholderText, {color: colors.textSecondary}]}>Post Image</Text>
             </View>
           </View>
         )}
 
         {/* Post Content */}
-        <View style={styles.contentSection}>
-          <Text style={styles.postContent}>{post.content}</Text>
+        <View style={[styles.contentSection, {backgroundColor: colors.surface, flexGrow: 1}]}>
+          <Text style={[styles.postContent, {color: colors.text}]}>{post.content}</Text>
         </View>
 
         {/* Action Buttons */}
-        <View style={styles.actionsSection}>
+        <View style={[styles.actionsSection, {backgroundColor: colors.surface, borderTopColor: colors.border}]}>
           <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-            <Icon name="share" size={24} color="#666" />
-            <Text style={styles.actionText}>Share</Text>
+            <Icon name="share" size={24} color={colors.textSecondary} />
+            <Text style={[styles.actionText, {color: colors.textSecondary}]}>Share</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -177,7 +179,7 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setShowMenu(false)}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, {backgroundColor: colors.surface}]}>
             <TouchableOpacity
               style={styles.menuItem}
               onPress={handleReport}>
@@ -189,7 +191,7 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
             <TouchableOpacity
               style={[styles.menuItem, styles.cancelItem]}
               onPress={() => setShowMenu(false)}>
-              <Text style={[styles.menuItemText, styles.cancelText]}>
+              <Text style={[styles.menuItemText, styles.cancelText, {color: colors.text}]}>
                 Cancel
               </Text>
             </TouchableOpacity>
@@ -203,7 +205,6 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -212,8 +213,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
-    backgroundColor: '#FFFFFF',
     ...Platform.select({
       android: {
         elevation: 0,
@@ -229,7 +228,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
   },
   headerActions: {
     flexDirection: 'row',
@@ -251,7 +249,6 @@ const styles = StyleSheet.create({
   userSection: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
   },
   userInfo: {
     flexDirection: 'row',
@@ -275,7 +272,6 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 4,
   },
   postMeta: {
@@ -284,17 +280,14 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 14,
-    color: '#999',
     marginLeft: 4,
   },
   separator: {
     fontSize: 14,
-    color: '#999',
     marginHorizontal: 6,
   },
   timeAgo: {
     fontSize: 14,
-    color: '#999',
   },
   imageContainer: {
     width: '100%',
@@ -310,29 +303,24 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F0F0F0',
   },
   imagePlaceholderText: {
     marginTop: 8,
     fontSize: 14,
-    color: '#999',
   },
   contentSection: {
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    minHeight: 200,
   },
   postContent: {
     fontSize: 16,
-    color: '#000',
     lineHeight: 24,
   },
   actionsSection: {
     flexDirection: 'row',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderTopWidth: 1,
   },
   actionButton: {
     flexDirection: 'row',
@@ -341,7 +329,6 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 16,
-    color: '#666',
     marginLeft: 6,
   },
   modalOverlay: {
@@ -351,7 +338,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     width: '80%',
     maxWidth: 320,

@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../context/ThemeContext';
 
 interface SearchResult {
   id: number;
@@ -24,6 +25,7 @@ interface SearchResult {
 
 const SearchScreen = () => {
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -133,7 +135,7 @@ const SearchScreen = () => {
 
   const renderSearchResult = ({item}: {item: SearchResult}) => {
     let iconName = 'person';
-    let iconColor = '#007AFF';
+    let iconColor = colors.primary;
 
     if (item.type === 'post') {
       iconName = 'article';
@@ -144,7 +146,7 @@ const SearchScreen = () => {
     }
 
     return (
-      <TouchableOpacity style={styles.resultItem}>
+      <TouchableOpacity style={[styles.resultItem, {backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
         <View style={styles.resultIconContainer}>
           {item.avatar ? (
             <View style={styles.avatarContainer}>
@@ -157,25 +159,25 @@ const SearchScreen = () => {
           )}
         </View>
         <View style={styles.resultContent}>
-          <Text style={styles.resultTitle}>{item.title}</Text>
-          <Text style={styles.resultSubtitle}>{item.subtitle}</Text>
+          <Text style={[styles.resultTitle, {color: colors.text}]}>{item.title}</Text>
+          <Text style={[styles.resultSubtitle, {color: colors.textSecondary}]}>{item.subtitle}</Text>
         </View>
-        <Icon name="chevron-right" size={24} color="#999" />
+        <Icon name="chevron-right" size={24} color={colors.textSecondary} />
       </TouchableOpacity>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       {/* Search Header */}
-      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
-        <View style={styles.searchContainer}>
-          <Icon name="search" size={24} color="#666" style={styles.searchIcon} />
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8), backgroundColor: colors.surface, borderBottomColor: colors.border}]}>
+        <View style={[styles.searchContainer, {backgroundColor: colors.inputBackground}]}>
+          <Icon name="search" size={24} color={colors.textSecondary} style={styles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, {color: colors.text}]}
             placeholder="Search users, posts, locations..."
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.placeholder}
             value={searchQuery}
             onChangeText={handleSearch}
             onSubmitEditing={handleSearchSubmit}
@@ -185,7 +187,7 @@ const SearchScreen = () => {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
-              <Icon name="close" size={20} color="#666" />
+              <Icon name="close" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           )}
         </View>
@@ -200,18 +202,18 @@ const SearchScreen = () => {
           {recentSearches.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Recent Searches</Text>
+                <Text style={[styles.sectionTitle, {color: colors.text}]}>Recent Searches</Text>
                 <TouchableOpacity onPress={clearRecentSearches}>
-                  <Text style={styles.clearText}>Clear</Text>
+                  <Text style={[styles.clearText, {color: colors.primary}]}>Clear</Text>
                 </TouchableOpacity>
               </View>
               {recentSearches.map((search, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={styles.recentSearchItem}
+                  style={[styles.recentSearchItem, {backgroundColor: colors.surface, borderBottomColor: colors.border}]}
                   onPress={() => handleRecentSearch(search)}>
-                  <Icon name="history" size={20} color="#666" />
-                  <Text style={styles.recentSearchText}>{search}</Text>
+                  <Icon name="history" size={20} color={colors.textSecondary} />
+                  <Text style={[styles.recentSearchText, {color: colors.text}]}>{search}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -219,47 +221,47 @@ const SearchScreen = () => {
 
           {/* Suggested Searches */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Suggested</Text>
+            <Text style={[styles.sectionTitle, {color: colors.text}]}>Suggested</Text>
             <View style={styles.suggestedContainer}>
               <TouchableOpacity
-                style={styles.suggestedChip}
+                style={[styles.suggestedChip, {backgroundColor: colors.primary + '20'}]}
                 onPress={() => handleSearch('Food Drive')}>
-                <Icon name="restaurant" size={16} color="#007AFF" />
-                <Text style={styles.suggestedText}>Food Drive</Text>
+                <Icon name="restaurant" size={16} color={colors.primary} />
+                <Text style={[styles.suggestedText, {color: colors.primary}]}>Food Drive</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.suggestedChip}
+                style={[styles.suggestedChip, {backgroundColor: colors.primary + '20'}]}
                 onPress={() => handleSearch('Clothing')}>
-                <Icon name="checkroom" size={16} color="#007AFF" />
-                <Text style={styles.suggestedText}>Clothing</Text>
+                <Icon name="checkroom" size={16} color={colors.primary} />
+                <Text style={[styles.suggestedText, {color: colors.primary}]}>Clothing</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.suggestedChip}
+                style={[styles.suggestedChip, {backgroundColor: colors.primary + '20'}]}
                 onPress={() => handleSearch('Volunteer')}>
-                <Icon name="volunteer-activism" size={16} color="#007AFF" />
-                <Text style={styles.suggestedText}>Volunteer</Text>
+                <Icon name="volunteer-activism" size={16} color={colors.primary} />
+                <Text style={[styles.suggestedText, {color: colors.primary}]}>Volunteer</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.suggestedChip}
+                style={[styles.suggestedChip, {backgroundColor: colors.primary + '20'}]}
                 onPress={() => handleSearch('New York')}>
-                <Icon name="location-on" size={16} color="#007AFF" />
-                <Text style={styles.suggestedText}>New York</Text>
+                <Icon name="location-on" size={16} color={colors.primary} />
+                <Text style={[styles.suggestedText, {color: colors.primary}]}>New York</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Popular Searches */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Popular</Text>
-            <View style={styles.popularList}>
+            <Text style={[styles.sectionTitle, {color: colors.text}]}>Popular</Text>
+            <View style={[styles.popularList, {backgroundColor: colors.surface}]}>
               {['Donation Centers', 'Animal Shelter', 'Food Bank', 'Community Help'].map(
                 (item, index) => (
                   <TouchableOpacity
                     key={index}
-                    style={styles.popularItem}
+                    style={[styles.popularItem, {borderBottomColor: colors.border}]}
                     onPress={() => handleSearch(item)}>
                     <Icon name="trending-up" size={20} color="#FF9500" />
-                    <Text style={styles.popularText}>{item}</Text>
+                    <Text style={[styles.popularText, {color: colors.text}]}>{item}</Text>
                   </TouchableOpacity>
                 ),
               )}
@@ -267,7 +269,7 @@ const SearchScreen = () => {
           </View>
         </ScrollView>
       ) : (
-        <View style={styles.resultsContainer}>
+        <View style={[styles.resultsContainer, {backgroundColor: colors.background}]}>
           {searchResults.length > 0 ? (
             <FlatList
               data={searchResults}
@@ -278,9 +280,9 @@ const SearchScreen = () => {
             />
           ) : (
             <View style={styles.emptyState}>
-              <Icon name="search-off" size={64} color="#CCC" />
-              <Text style={styles.emptyStateTitle}>No results found</Text>
-              <Text style={styles.emptyStateText}>
+              <Icon name="search-off" size={64} color={colors.textSecondary} />
+              <Text style={[styles.emptyStateTitle, {color: colors.text}]}>No results found</Text>
+              <Text style={[styles.emptyStateText, {color: colors.textSecondary}]}>
                 Try searching for something else
               </Text>
             </View>
@@ -294,14 +296,11 @@ const SearchScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   header: {
-    backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
     ...Platform.select({
       android: {
         elevation: 0,
@@ -314,7 +313,6 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
     borderRadius: 12,
     paddingHorizontal: 12,
     height: 44,
@@ -325,7 +323,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#000',
     padding: 0,
   },
   clearButton: {
@@ -349,11 +346,9 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
   },
   clearText: {
     fontSize: 14,
-    color: '#007AFF',
     fontWeight: '500',
   },
   recentSearchItem: {
@@ -366,7 +361,6 @@ const styles = StyleSheet.create({
   },
   recentSearchText: {
     fontSize: 16,
-    color: '#000',
     marginLeft: 12,
   },
   suggestedContainer: {
@@ -377,7 +371,6 @@ const styles = StyleSheet.create({
   suggestedChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0F8FF',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
@@ -386,12 +379,10 @@ const styles = StyleSheet.create({
   },
   suggestedText: {
     fontSize: 14,
-    color: '#007AFF',
     fontWeight: '500',
     marginLeft: 6,
   },
   popularList: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -405,12 +396,10 @@ const styles = StyleSheet.create({
   },
   popularText: {
     fontSize: 16,
-    color: '#000',
     marginLeft: 12,
   },
   resultsContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   resultsList: {
     padding: 16,
@@ -449,12 +438,10 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 4,
   },
   resultSubtitle: {
     fontSize: 14,
-    color: '#666',
   },
   emptyState: {
     flex: 1,
@@ -465,13 +452,11 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#000',
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#666',
     textAlign: 'center',
   },
 });

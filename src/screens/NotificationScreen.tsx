@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../context/ThemeContext';
 
 interface Notification {
   id: number;
@@ -30,6 +31,7 @@ interface NotificationScreenProps {
 
 const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => {
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   const [refreshing, setRefreshing] = useState(false);
 
   // Dummy notifications data
@@ -202,14 +204,14 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       {/* Header */}
-      <View style={[styles.header, {paddingTop: Math.max(insets.top, 16)}]}>
-        <Text style={styles.headerTitle}>Notifications</Text>
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 16), backgroundColor: colors.headerBackground, borderBottomColor: colors.border}]}>
+        <Text style={[styles.headerTitle, {color: colors.text}]}>Notifications</Text>
         {unreadCount > 0 && (
           <TouchableOpacity onPress={markAllAsRead} style={styles.markAllButton}>
-            <Text style={styles.markAllText}>Mark all as read</Text>
+            <Text style={[styles.markAllText, {color: colors.primary}]}>Mark all as read</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -231,25 +233,23 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
         }>
         {notifications.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Icon name="notifications-off" size={64} color="#CCC" />
-            <Text style={styles.emptyText}>No notifications</Text>
-            <Text style={styles.emptySubtext}>
+            <Icon name="notifications-off" size={64} color={colors.textSecondary} />
+            <Text style={[styles.emptyText, {color: colors.text}]}>No notifications</Text>
+            <Text style={[styles.emptySubtext, {color: colors.textSecondary}]}>
               You're all caught up! New notifications will appear here.
             </Text>
           </View>
         ) : (
           notifications.map(notification => (
-              <TouchableOpacity
+            <TouchableOpacity
                 key={notification.id}
                 style={[
                   styles.notificationItem,
+                  {backgroundColor: colors.surface, borderColor: colors.border},
                   !notification.isRead && styles.unreadNotification,
                 ]}
                 activeOpacity={0.7}
                 onPress={() => handleNotificationPress(notification)}>
-              {/* Unread Indicator Bar */}
-              {!notification.isRead && <View style={styles.unreadIndicatorBar} />}
-
               {/* Avatar/Icon */}
               <View
                 style={[
@@ -273,11 +273,12 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
               </View>
 
               {/* Content */}
-              <View style={[styles.contentContainer, {zIndex: 1}]}>
+              <View style={[styles.contentContainer, {minWidth: 0, zIndex: 1}]}>
                 <View style={styles.titleRow}>
                   <Text
                     style={[
                       styles.notificationTitle,
+                      {color: colors.text},
                       !notification.isRead && styles.unreadTitle,
                     ]}
                     numberOfLines={1}>
@@ -288,16 +289,17 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
                 <Text
                   style={[
                     styles.notificationMessage,
+                    {color: colors.textSecondary},
                     !notification.isRead && styles.unreadMessage,
                   ]}
                   numberOfLines={2}>
                   {notification.message || 'No message'}
                 </Text>
-                <Text style={styles.timeAgo}>{notification.timeAgo || 'Just now'}</Text>
+                <Text style={[styles.timeAgo, {color: colors.textSecondary, marginTop: 2}]}>{notification.timeAgo || 'Just now'}</Text>
               </View>
 
               {/* Arrow */}
-              <Icon name="chevron-right" size={20} color="#CCC" style={{marginLeft: 8}} />
+              <Icon name="chevron-right" size={20} color={colors.textSecondary} style={{marginLeft: 8}} />
             </TouchableOpacity>
           ))
         )}
@@ -309,7 +311,6 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   header: {
     flexDirection: 'row',
@@ -318,8 +319,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 12,
     paddingTop: 0,
-    backgroundColor: '#F5F5F5',
-    borderBottomWidth: 0,
+    borderBottomWidth: 1,
     minHeight: 50,
     ...Platform.select({
       android: {
@@ -333,7 +333,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#000',
   },
   markAllButton: {
     paddingVertical: 6,
@@ -360,18 +359,15 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#666',
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#999',
     marginTop: 8,
     textAlign: 'center',
   },
   notificationItem: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingLeft: 20,
     paddingRight: 16,
@@ -381,12 +377,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'visible',
     borderWidth: 0.5,
-    borderColor: '#E5E5EA',
     minHeight: 80,
     position: 'relative',
   },
   unreadNotification: {
-    backgroundColor: '#FFFFFF',
+    // No background override - uses theme colors from inline style
   },
   unreadIndicatorBar: {
     position: 'absolute',
@@ -430,13 +425,12 @@ const styles = StyleSheet.create({
   notificationTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000000',
     marginRight: 8,
     flexShrink: 1,
   },
   unreadTitle: {
     fontWeight: '700',
-    color: '#000',
+    // Color is set inline with theme colors
   },
   unreadDot: {
     width: 8,
@@ -447,18 +441,16 @@ const styles = StyleSheet.create({
   },
   notificationMessage: {
     fontSize: 14,
-    color: '#666666',
     lineHeight: 20,
     marginBottom: 4,
     flexShrink: 1,
   },
   unreadMessage: {
-    color: '#666',
     fontWeight: '400',
+    // Color is set inline with theme colors
   },
   timeAgo: {
     fontSize: 12,
-    color: '#999999',
     marginTop: 2,
   },
 });

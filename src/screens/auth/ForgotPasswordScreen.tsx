@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../../context/ThemeContext';
 
 interface ForgotPasswordScreenProps {
   navigation: any;
@@ -23,6 +24,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   navigation,
 }) => {
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({email: ''});
 
@@ -58,8 +60,8 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
@@ -70,13 +72,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               style={styles.backButton}>
-              <Icon name="arrow-back" size={24} color="#000" />
+              <Icon name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
-            <View style={styles.iconContainer}>
-              <Icon name="lock-reset" size={64} color="#007AFF" />
+            <View style={[styles.iconContainer, {backgroundColor: colors.primary + '20'}]}>
+              <Icon name="lock-reset" size={64} color={colors.primary} />
             </View>
-            <Text style={styles.title}>Forgot Password?</Text>
-            <Text style={styles.subtitle}>
+            <Text style={[styles.title, {color: colors.text}]}>Forgot Password?</Text>
+            <Text style={[styles.subtitle, {color: colors.textSecondary}]}>
               Don't worry! Enter your email address and we'll send you a link to
               reset your password.
             </Text>
@@ -85,13 +87,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
           <View style={styles.form}>
             {/* Email Input */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="email" size={20} color="#666" style={styles.icon} />
+              <Text style={[styles.label, {color: colors.text}]}>Email</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="email" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your email"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={email}
                   onChangeText={text => {
                     setEmail(text);
@@ -109,16 +111,16 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
 
             {/* Reset Button */}
             <TouchableOpacity
-              style={styles.resetButton}
+              style={[styles.resetButton, {backgroundColor: colors.primary}]}
               onPress={handleResetPassword}>
               <Text style={styles.resetButtonText}>Send Reset Link</Text>
             </TouchableOpacity>
 
             {/* Back to Login */}
             <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Remember your password? </Text>
+              <Text style={[styles.loginText, {color: colors.textSecondary}]}>Remember your password? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.loginLink}>Sign In</Text>
+                <Text style={[styles.loginLink, {color: colors.primary}]}>Sign In</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -131,7 +133,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   keyboardView: {
     flex: 1,
@@ -152,7 +153,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#F0F8FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
@@ -160,13 +160,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#000',
     marginBottom: 12,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: 20,
@@ -180,16 +178,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 12,
-    backgroundColor: '#F9F9F9',
     paddingHorizontal: 12,
   },
   icon: {
@@ -199,7 +194,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#000',
   },
   errorText: {
     color: '#FF3B30',
@@ -208,7 +202,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   resetButton: {
-    backgroundColor: '#007AFF',
     borderRadius: 12,
     height: 50,
     justifyContent: 'center',
@@ -226,11 +219,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginText: {
-    color: '#666',
     fontSize: 14,
   },
   loginLink: {
-    color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
   },
