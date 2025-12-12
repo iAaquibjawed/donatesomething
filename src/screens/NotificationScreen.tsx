@@ -39,13 +39,23 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
       type: 'post',
       title: 'New Post Available',
       message: 'Sarah Johnson posted about a food drive in your area',
-      timeAgo: '5 minutes ago',
+      timeAgo: '2 minutes ago',
       isRead: false,
       avatar: '👩',
       userName: 'Sarah Johnson',
     },
     {
       id: 2,
+      type: 'follow',
+      title: 'New Follower',
+      message: 'Alex Thompson started following you',
+      timeAgo: '8 minutes ago',
+      isRead: false,
+      avatar: '👨',
+      userName: 'Alex Thompson',
+    },
+    {
+      id: 3,
       type: 'like',
       title: 'Post Liked',
       message: 'Michael Chen liked your post about clothing donation',
@@ -55,17 +65,37 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
       userName: 'Michael Chen',
     },
     {
-      id: 3,
+      id: 4,
       type: 'comment',
       title: 'New Comment',
       message: 'Emily Rodriguez commented on your post: "Great initiative!"',
-      timeAgo: '1 hour ago',
+      timeAgo: '25 minutes ago',
       isRead: false,
       avatar: '👩‍🦰',
       userName: 'Emily Rodriguez',
     },
     {
-      id: 4,
+      id: 5,
+      type: 'message',
+      title: 'New Message',
+      message: 'Lisa Wang sent you a message about food donation',
+      timeAgo: '45 minutes ago',
+      isRead: false,
+      avatar: '👩',
+      userName: 'Lisa Wang',
+    },
+    {
+      id: 6,
+      type: 'post',
+      title: 'New Post Available',
+      message: 'James Wilson shared a new food donation opportunity',
+      timeAgo: '1 hour ago',
+      isRead: false,
+      avatar: '👨‍💼',
+      userName: 'James Wilson',
+    },
+    {
+      id: 7,
       type: 'follow',
       title: 'New Follower',
       message: 'David Kim started following you',
@@ -75,7 +105,7 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
       userName: 'David Kim',
     },
     {
-      id: 5,
+      id: 8,
       type: 'post',
       title: 'New Post Available',
       message: 'Jessica Martinez posted about volunteering opportunities',
@@ -85,7 +115,7 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
       userName: 'Jessica Martinez',
     },
     {
-      id: 6,
+      id: 9,
       type: 'system',
       title: 'System Update',
       message: 'New features available! Check out the latest updates.',
@@ -93,7 +123,7 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
       isRead: true,
     },
     {
-      id: 7,
+      id: 10,
       type: 'message',
       title: 'New Message',
       message: 'Robert Taylor sent you a message about your donation',
@@ -175,7 +205,7 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       {/* Header */}
-      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 16)}]}>
         <Text style={styles.headerTitle}>Notifications</Text>
         {unreadCount > 0 && (
           <TouchableOpacity onPress={markAllAsRead} style={styles.markAllButton}>
@@ -187,8 +217,15 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
       {/* Notifications List */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, {paddingBottom: Math.max(insets.bottom, 0) + 80}]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingTop: 8,
+            paddingBottom: Math.max(insets.bottom, 0) + 80,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
+        removeClippedSubviews={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
@@ -202,19 +239,25 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
           </View>
         ) : (
           notifications.map(notification => (
-            <TouchableOpacity
-              key={notification.id}
-              style={[
-                styles.notificationItem,
-                !notification.isRead && styles.unreadNotification,
-              ]}
-              activeOpacity={0.7}
-              onPress={() => handleNotificationPress(notification)}>
+              <TouchableOpacity
+                key={notification.id}
+                style={[
+                  styles.notificationItem,
+                  !notification.isRead && styles.unreadNotification,
+                ]}
+                activeOpacity={0.7}
+                onPress={() => handleNotificationPress(notification)}>
+              {/* Unread Indicator Bar */}
+              {!notification.isRead && <View style={styles.unreadIndicatorBar} />}
+
               {/* Avatar/Icon */}
               <View
                 style={[
                   styles.iconContainer,
-                  {backgroundColor: getNotificationColor(notification.type) + '20'},
+                  {
+                    backgroundColor: getNotificationColor(notification.type) + '20',
+                    zIndex: 1,
+                  },
                 ]}>
                 {notification.avatar ? (
                   <View style={styles.avatarContainer}>
@@ -230,19 +273,31 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({navigation}) => 
               </View>
 
               {/* Content */}
-              <View style={styles.contentContainer}>
+              <View style={[styles.contentContainer, {zIndex: 1}]}>
                 <View style={styles.titleRow}>
-                  <Text style={styles.notificationTitle}>{notification.title}</Text>
+                  <Text
+                    style={[
+                      styles.notificationTitle,
+                      !notification.isRead && styles.unreadTitle,
+                    ]}
+                    numberOfLines={1}>
+                    {notification.title || 'Notification'}
+                  </Text>
                   {!notification.isRead && <View style={styles.unreadDot} />}
                 </View>
-                <Text style={styles.notificationMessage}>
-                  {notification.message}
+                <Text
+                  style={[
+                    styles.notificationMessage,
+                    !notification.isRead && styles.unreadMessage,
+                  ]}
+                  numberOfLines={2}>
+                  {notification.message || 'No message'}
                 </Text>
-                <Text style={styles.timeAgo}>{notification.timeAgo}</Text>
+                <Text style={styles.timeAgo}>{notification.timeAgo || 'Just now'}</Text>
               </View>
 
               {/* Arrow */}
-              <Icon name="chevron-right" size={20} color="#CCC" />
+              <Icon name="chevron-right" size={20} color="#CCC" style={{marginLeft: 8}} />
             </TouchableOpacity>
           ))
         )}
@@ -261,10 +316,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
+    paddingBottom: 12,
+    paddingTop: 0,
+    backgroundColor: '#F5F5F5',
+    borderBottomWidth: 0,
+    minHeight: 50,
     ...Platform.select({
       android: {
         elevation: 0,
@@ -292,7 +348,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   emptyContainer: {
     flex: 1,
@@ -316,22 +373,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    paddingLeft: 20,
+    paddingRight: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
+    marginBottom: 8,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    overflow: 'visible',
+    borderWidth: 0.5,
+    borderColor: '#E5E5EA',
+    minHeight: 80,
+    position: 'relative',
   },
   unreadNotification: {
-    backgroundColor: '#F0F8FF',
-    borderLeftWidth: 3,
-    borderLeftColor: '#007AFF',
+    backgroundColor: '#FFFFFF',
+  },
+  unreadIndicatorBar: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+    backgroundColor: '#007AFF',
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    zIndex: 0,
   },
   iconContainer: {
     width: 48,
@@ -354,6 +420,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    minWidth: 0,
   },
   titleRow: {
     flexDirection: 'row',
@@ -363,24 +430,36 @@ const styles = StyleSheet.create({
   notificationTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#000000',
     marginRight: 8,
+    flexShrink: 1,
+  },
+  unreadTitle: {
+    fontWeight: '700',
+    color: '#000',
   },
   unreadDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: '#007AFF',
+    marginLeft: 6,
   },
   notificationMessage: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
     lineHeight: 20,
     marginBottom: 4,
+    flexShrink: 1,
+  },
+  unreadMessage: {
+    color: '#666',
+    fontWeight: '400',
   },
   timeAgo: {
     fontSize: 12,
-    color: '#999',
+    color: '#999999',
+    marginTop: 2,
   },
 });
 
