@@ -17,6 +17,7 @@ import NotificationScreen from './src/screens/NotificationScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import PostDetailScreen from './src/screens/PostDetailScreen';
+import CreatePostScreen from './src/screens/CreatePostScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import SignupScreen from './src/screens/auth/SignupScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
@@ -34,6 +35,7 @@ function MainAppNavigator() {
       <Stack.Screen name="MainTabs" component={MainTabsNavigator} />
       <Stack.Screen name="PostDetail" component={PostDetailScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="CreatePost" component={CreatePostScreen} />
     </Stack.Navigator>
   );
 }
