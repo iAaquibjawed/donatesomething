@@ -13,6 +13,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
+import CreatePostScreen from './src/screens/CreatePostScreen';
 import PostDetailScreen from './src/screens/PostDetailScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import SignupScreen from './src/screens/auth/SignupScreen';
@@ -31,6 +32,7 @@ function MainAppNavigator() {
       <Stack.Screen name="MainTabs" component={MainTabsNavigator} />
       <Stack.Screen name="PostDetail" component={PostDetailScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="CreatePost" component={CreatePostScreen} />
     </Stack.Navigator>
   );
 }
