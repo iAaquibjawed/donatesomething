@@ -15,6 +15,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '../../context/ThemeContext';
+import Logo from '../../components/Logo';
 
 interface LoginScreenProps {
   navigation: any;
@@ -68,6 +69,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
+            <Logo size={100} style={styles.logoContainer} />
             <Text style={[styles.title, {color: colors.text}]}>Welcome Back</Text>
             <Text style={[styles.subtitle, {color: colors.textSecondary}]}>Sign in to continue</Text>
           </View>
@@ -173,6 +175,10 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 40,
+    alignItems: 'center',
+  },
+  logoContainer: {
+    marginBottom: 24,
   },
   title: {
     fontSize: 32,

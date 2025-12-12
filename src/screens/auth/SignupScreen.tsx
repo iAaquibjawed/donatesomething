@@ -15,6 +15,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '../../context/ThemeContext';
+import Logo from '../../components/Logo';
 
 interface SignupScreenProps {
   navigation: any;
@@ -123,6 +124,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
               style={styles.backButton}>
               <Icon name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
+            <Logo size={80} style={styles.logoContainer} />
             <Text style={[styles.title, {color: colors.text}]}>Create Account</Text>
             <Text style={[styles.subtitle, {color: colors.textSecondary}]}>Sign up to get started</Text>
           </View>
@@ -430,8 +432,13 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 30,
+    alignItems: 'center',
   },
   backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  logoContainer: {
     marginBottom: 16,
   },
   title: {

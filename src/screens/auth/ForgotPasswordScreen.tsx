@@ -15,6 +15,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '../../context/ThemeContext';
+import Logo from '../../components/Logo';
 
 interface ForgotPasswordScreenProps {
   navigation: any;
@@ -74,9 +75,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
               style={styles.backButton}>
               <Icon name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
-            <View style={[styles.iconContainer, {backgroundColor: colors.primary + '20'}]}>
-              <Icon name="lock-reset" size={64} color={colors.primary} />
-            </View>
+            <Logo size={80} style={styles.logoContainer} />
             <Text style={[styles.title, {color: colors.text}]}>Forgot Password?</Text>
             <Text style={[styles.subtitle, {color: colors.textSecondary}]}>
               Don't worry! Enter your email address and we'll send you a link to
@@ -149,12 +148,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginBottom: 20,
   },
-  iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+  logoContainer: {
     marginBottom: 24,
   },
   title: {
