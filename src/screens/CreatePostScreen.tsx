@@ -11,7 +11,9 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  StatusBar,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   launchImageLibrary,
@@ -21,9 +23,9 @@ import {
 
 interface CreatePostScreenProps {
   navigation: any;
-  route: {
-    params: {
-      userData: {
+  route?: {
+    params?: {
+      userData?: {
         firstName: string;
         lastName: string;
         accountType: 'want' | 'provide';
@@ -36,7 +38,13 @@ const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
   navigation,
   route,
 }) => {
-  const {userData} = route.params;
+  // Default user data if not provided
+  const defaultUserData = {
+    firstName: 'User',
+    lastName: 'Name',
+    accountType: 'provide' as 'want' | 'provide',
+  };
+  const userData = route?.params?.userData || defaultUserData;
   const [content, setContent] = useState('');
   const [location, setLocation] = useState('');
   const [postImage, setPostImage] = useState<string | null>(null);
@@ -98,26 +106,24 @@ const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
         {
           text: 'OK',
           onPress: () => {
-            // Navigate back to profile and pass the new post
-            navigation.navigate('MainTabs', {
-              screen: 'Profile',
-              params: {
-                newPost: newPost,
-              },
-            });
+            // Navigate back to home screen
+            navigation.goBack();
           },
         },
       ]);
     }
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}>
@@ -237,7 +243,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+      ios: {
+        shadowOpacity: 0,
+      },
+    }),
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
