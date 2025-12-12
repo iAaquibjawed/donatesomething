@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../../context/ThemeContext';
 
 interface SignupScreenProps {
   navigation: any;
@@ -21,6 +22,7 @@ interface SignupScreenProps {
 
 const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -106,8 +108,8 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
@@ -119,22 +121,22 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               style={styles.backButton}>
-              <Icon name="arrow-back" size={24} color="#000" />
+              <Icon name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Sign up to get started</Text>
+            <Text style={[styles.title, {color: colors.text}]}>Create Account</Text>
+            <Text style={[styles.subtitle, {color: colors.textSecondary}]}>Sign up to get started</Text>
           </View>
 
           <View style={styles.form}>
             {/* First Name */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>First Name</Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="person" size={20} color="#666" style={styles.icon} />
+              <Text style={[styles.label, {color: colors.text}]}>First Name</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="person" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your first name"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={firstName}
                   onChangeText={text => {
                     setFirstName(text);
@@ -151,13 +153,13 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
             {/* Last Name */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Last Name</Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="person" size={20} color="#666" style={styles.icon} />
+              <Text style={[styles.label, {color: colors.text}]}>Last Name</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="person" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your last name"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={lastName}
                   onChangeText={text => {
                     setLastName(text);
@@ -173,13 +175,13 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
             {/* Email */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="email" size={20} color="#666" style={styles.icon} />
+              <Text style={[styles.label, {color: colors.text}]}>Email</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="email" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your email"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={email}
                   onChangeText={text => {
                     setEmail(text);
@@ -197,15 +199,15 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
             {/* Phone (Optional) */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>
-                Phone Number <Text style={styles.optional}>(Optional)</Text>
+              <Text style={[styles.label, {color: colors.text}]}>
+                Phone Number <Text style={[styles.optional, {color: colors.textSecondary}]}>(Optional)</Text>
               </Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="phone" size={20} color="#666" style={styles.icon} />
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="phone" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your phone number"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={phone}
                   onChangeText={text => {
                     setPhone(text);
@@ -221,15 +223,16 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
             {/* Account Type */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Account Type *</Text>
-              <Text style={styles.subLabel}>
+              <Text style={[styles.label, {color: colors.text}]}>Account Type *</Text>
+              <Text style={[styles.subLabel, {color: colors.textSecondary}]}>
                 Are you looking for food or providing food?
               </Text>
               <View style={styles.accountTypeContainer}>
                 <TouchableOpacity
                   style={[
                     styles.accountTypeOption,
-                    accountType === 'want' && styles.accountTypeOptionSelected,
+                    {backgroundColor: colors.inputBackground, borderColor: colors.border},
+                    accountType === 'want' && [styles.accountTypeOptionSelected, {borderColor: colors.primary}],
                   ]}
                   onPress={() => {
                     setAccountType('want');
@@ -239,28 +242,29 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
                   <View
                     style={[
                       styles.radioButton,
-                      accountType === 'want' && styles.radioButtonSelected,
+                      {borderColor: colors.border},
+                      accountType === 'want' && [styles.radioButtonSelected, {borderColor: colors.primary}],
                     ]}>
                     {accountType === 'want' && (
-                      <View style={styles.radioButtonInner} />
+                      <View style={[styles.radioButtonInner, {backgroundColor: colors.primary}]} />
                     )}
                   </View>
                   <View style={styles.accountTypeContent}>
                     <Icon
                       name="restaurant"
                       size={24}
-                      color={accountType === 'want' ? '#007AFF' : '#666'}
+                      color={accountType === 'want' ? colors.primary : colors.textSecondary}
                     />
                     <View style={styles.accountTypeTextContainer}>
                       <Text
                         style={[
                           styles.accountTypeTitle,
-                          accountType === 'want' &&
-                            styles.accountTypeTitleSelected,
+                          {color: colors.text},
+                          accountType === 'want' && [styles.accountTypeTitleSelected, {color: colors.primary}],
                         ]}>
                         I Want Food
                       </Text>
-                      <Text style={styles.accountTypeDescription}>
+                      <Text style={[styles.accountTypeDescription, {color: colors.textSecondary}]}>
                         Looking for food assistance
                       </Text>
                     </View>
@@ -270,8 +274,8 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
                 <TouchableOpacity
                   style={[
                     styles.accountTypeOption,
-                    accountType === 'provide' &&
-                      styles.accountTypeOptionSelected,
+                    {backgroundColor: colors.inputBackground, borderColor: colors.border},
+                    accountType === 'provide' && [styles.accountTypeOptionSelected, {borderColor: colors.primary}],
                   ]}
                   onPress={() => {
                     setAccountType('provide');
@@ -281,29 +285,29 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
                   <View
                     style={[
                       styles.radioButton,
-                      accountType === 'provide' &&
-                        styles.radioButtonSelected,
+                      {borderColor: colors.border},
+                      accountType === 'provide' && [styles.radioButtonSelected, {borderColor: colors.primary}],
                     ]}>
                     {accountType === 'provide' && (
-                      <View style={styles.radioButtonInner} />
+                      <View style={[styles.radioButtonInner, {backgroundColor: colors.primary}]} />
                     )}
                   </View>
                   <View style={styles.accountTypeContent}>
                     <Icon
                       name="volunteer-activism"
                       size={24}
-                      color={accountType === 'provide' ? '#007AFF' : '#666'}
+                      color={accountType === 'provide' ? colors.primary : colors.textSecondary}
                     />
                     <View style={styles.accountTypeTextContainer}>
                       <Text
                         style={[
                           styles.accountTypeTitle,
-                          accountType === 'provide' &&
-                            styles.accountTypeTitleSelected,
+                          {color: colors.text},
+                          accountType === 'provide' && [styles.accountTypeTitleSelected, {color: colors.primary}],
                         ]}>
                         I Provide Food
                       </Text>
-                      <Text style={styles.accountTypeDescription}>
+                      <Text style={[styles.accountTypeDescription, {color: colors.textSecondary}]}>
                         Donating or providing food
                       </Text>
                     </View>
@@ -317,18 +321,18 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
             {/* Password */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.label, {color: colors.text}]}>Password</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
                 <Icon
                   name="lock"
                   size={20}
-                  color="#666"
+                  color={colors.textSecondary}
                   style={styles.icon}
                 />
                 <TextInput
-                  style={[styles.input, styles.passwordInput]}
+                  style={[styles.input, styles.passwordInput, {color: colors.text}]}
                   placeholder="Enter your password"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={password}
                   onChangeText={text => {
                     setPassword(text);
@@ -343,7 +347,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
                   <Icon
                     name={showPassword ? 'visibility' : 'visibility-off'}
                     size={20}
-                    color="#666"
+                    color={colors.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -354,18 +358,18 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
             {/* Confirm Password */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Confirm Password</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.label, {color: colors.text}]}>Confirm Password</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
                 <Icon
                   name="lock"
                   size={20}
-                  color="#666"
+                  color={colors.textSecondary}
                   style={styles.icon}
                 />
                 <TextInput
-                  style={[styles.input, styles.passwordInput]}
+                  style={[styles.input, styles.passwordInput, {color: colors.text}]}
                   placeholder="Confirm your password"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={confirmPassword}
                   onChangeText={text => {
                     setConfirmPassword(text);
@@ -383,7 +387,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
                   <Icon
                     name={showConfirmPassword ? 'visibility' : 'visibility-off'}
                     size={20}
-                    color="#666"
+                    color={colors.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -394,16 +398,16 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
             {/* Sign Up Button */}
             <TouchableOpacity
-              style={styles.signupButton}
+              style={[styles.signupButton, {backgroundColor: colors.primary}]}
               onPress={handleSignup}>
               <Text style={styles.signupButtonText}>Sign Up</Text>
             </TouchableOpacity>
 
             {/* Login Link */}
             <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Already have an account? </Text>
+              <Text style={[styles.loginText, {color: colors.textSecondary}]}>Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.loginLink}>Sign In</Text>
+                <Text style={[styles.loginLink, {color: colors.primary}]}>Sign In</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -416,7 +420,6 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   keyboardView: {
     flex: 1,
@@ -434,12 +437,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#000',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
   },
   form: {
     flex: 1,
@@ -450,20 +451,20 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 8,
   },
   optional: {
     fontWeight: '400',
-    color: '#999',
+  },
+  subLabel: {
+    fontSize: 12,
+    marginBottom: 12,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 12,
-    backgroundColor: '#F9F9F9',
     paddingHorizontal: 12,
   },
   icon: {
@@ -473,7 +474,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#000',
   },
   passwordInput: {
     paddingRight: 40,
@@ -488,7 +488,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   signupButton: {
-    backgroundColor: '#007AFF',
     borderRadius: 12,
     height: 50,
     justifyContent: 'center',
@@ -508,11 +507,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   loginText: {
-    color: '#666',
     fontSize: 14,
   },
   loginLink: {
-    color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
   },

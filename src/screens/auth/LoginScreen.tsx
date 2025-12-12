@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../../context/ThemeContext';
 
 interface LoginScreenProps {
   navigation: any;
@@ -21,6 +22,7 @@ interface LoginScreenProps {
 
 const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   const insets = useSafeAreaInsets();
+  const {colors, isDark} = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -57,7 +59,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
@@ -65,20 +68,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in to continue</Text>
+            <Text style={[styles.title, {color: colors.text}]}>Welcome Back</Text>
+            <Text style={[styles.subtitle, {color: colors.textSecondary}]}>Sign in to continue</Text>
           </View>
 
           <View style={styles.form}>
             {/* Email Input */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.inputWrapper}>
-                <Icon name="email" size={20} color="#666" style={styles.icon} />
+              <Text style={[styles.label, {color: colors.text}]}>Email</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
+                <Icon name="email" size={20} color={colors.textSecondary} style={styles.icon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {color: colors.text}]}
                   placeholder="Enter your email"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={email}
                   onChangeText={text => {
                     setEmail(text);
@@ -96,18 +99,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 
             {/* Password Input */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.label, {color: colors.text}]}>Password</Text>
+              <View style={[styles.inputWrapper, {backgroundColor: colors.inputBackground, borderColor: colors.border}]}>
                 <Icon
                   name="lock"
                   size={20}
-                  color="#666"
+                  color={colors.textSecondary}
                   style={styles.icon}
                 />
                 <TextInput
-                  style={[styles.input, styles.passwordInput]}
+                  style={[styles.input, styles.passwordInput, {color: colors.text}]}
                   placeholder="Enter your password"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.placeholder}
                   value={password}
                   onChangeText={text => {
                     setPassword(text);
@@ -122,7 +125,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
                   <Icon
                     name={showPassword ? 'visibility' : 'visibility-off'}
                     size={20}
-                    color="#666"
+                    color={colors.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -135,19 +138,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             <TouchableOpacity
               onPress={() => navigation.navigate('ForgotPassword')}
               style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              <Text style={[styles.forgotPasswordText, {color: colors.primary}]}>Forgot Password?</Text>
             </TouchableOpacity>
 
             {/* Login Button */}
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <TouchableOpacity style={[styles.loginButton, {backgroundColor: colors.primary}]} onPress={handleLogin}>
               <Text style={styles.loginButtonText}>Sign In</Text>
             </TouchableOpacity>
 
             {/* Sign Up Link */}
             <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>Don't have an account? </Text>
+              <Text style={[styles.signupText, {color: colors.textSecondary}]}>Don't have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                <Text style={styles.signupLink}>Sign Up</Text>
+                <Text style={[styles.signupLink, {color: colors.primary}]}>Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -160,7 +163,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   keyboardView: {
     flex: 1,
@@ -175,12 +177,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#000',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
   },
   form: {
     flex: 1,
@@ -191,16 +191,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 12,
-    backgroundColor: '#F9F9F9',
     paddingHorizontal: 12,
   },
   icon: {
@@ -210,7 +207,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#000',
   },
   passwordInput: {
     paddingRight: 40,
@@ -229,12 +225,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   forgotPasswordText: {
-    color: '#007AFF',
     fontSize: 14,
     fontWeight: '500',
   },
   loginButton: {
-    backgroundColor: '#007AFF',
     borderRadius: 12,
     height: 50,
     justifyContent: 'center',
@@ -252,11 +246,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   signupText: {
-    color: '#666',
     fontSize: 14,
   },
   signupLink: {
-    color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
   },

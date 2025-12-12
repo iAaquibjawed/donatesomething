@@ -20,6 +20,7 @@ import {
   MediaType,
 } from 'react-native-image-picker';
 import {useTheme} from '../context/ThemeContext';
+import {useUser} from '../context/UserContext';
 
 interface ProfileScreenProps {
   navigation: any;
@@ -29,6 +30,7 @@ interface ProfileScreenProps {
 const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
   const {colors, isDark, themeMode, setThemeMode} = useTheme();
+  const {setAccountType} = useUser();
 
   // Dummy user data - in a real app, this would come from state management or API
   const [userData, setUserData] = useState({
@@ -64,8 +66,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
   useEffect(() => {
     if (route?.params?.updatedUserData) {
       setUserData(route.params.updatedUserData);
+      // Update account type in context
+      setAccountType(route.params.updatedUserData.accountType);
     }
-  }, [route?.params?.updatedUserData]);
+  }, [route?.params?.updatedUserData, setAccountType]);
+
+  // Sync account type with context on mount
+  useEffect(() => {
+    setAccountType(userData.accountType);
+  }, [setAccountType, userData.accountType]);
 
   // Update posts if a new post was created
   useEffect(() => {
@@ -193,6 +202,41 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
               </Text>
             </View>
           </View>
+        </View>
+
+        {/* Following/Followers Section */}
+        <View style={[styles.followSection, {backgroundColor: colors.surface}]}>
+          {userData.accountType === 'want' ? (
+            <TouchableOpacity
+              style={[styles.followButton, {borderColor: colors.border}]}
+              onPress={() => navigation.navigate('Following')}>
+              <View style={styles.followButtonContent}>
+                <Icon name="people" size={20} color={colors.primary} />
+                <View style={styles.followButtonTextContainer}>
+                  <Text style={[styles.followButtonTitle, {color: colors.text}]}>Following</Text>
+                  <Text style={[styles.followButtonSubtitle, {color: colors.textSecondary}]}>
+                    See who you're following
+                  </Text>
+                </View>
+              </View>
+              <Icon name="chevron-right" size={24} color={colors.textSecondary} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.followButton, {borderColor: colors.border}]}
+              onPress={() => navigation.navigate('Followers')}>
+              <View style={styles.followButtonContent}>
+                <Icon name="people" size={20} color={colors.primary} />
+                <View style={styles.followButtonTextContainer}>
+                  <Text style={[styles.followButtonTitle, {color: colors.text}]}>Followers</Text>
+                  <Text style={[styles.followButtonSubtitle, {color: colors.textSecondary}]}>
+                    See who follows you
+                  </Text>
+                </View>
+              </View>
+              <Icon name="chevron-right" size={24} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* My Posts Section - Only for Food Providers */}
@@ -563,6 +607,38 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     alignSelf: 'flex-start',
+  },
+  followSection: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  followButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderWidth: 1,
+  },
+  followButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  followButtonTextContainer: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  followButtonTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  followButtonSubtitle: {
+    fontSize: 12,
   },
   myPostsSection: {
     marginBottom: 20,
