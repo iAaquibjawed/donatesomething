@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Alert,
   StatusBar,
   Platform,
+  Modal,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -37,6 +38,7 @@ interface PostDetailScreenProps {
 const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) => {
   const {post} = route.params;
   const insets = useSafeAreaInsets();
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleShare = async () => {
     try {
@@ -63,6 +65,31 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
     }
   };
 
+  const handleReport = () => {
+    setShowMenu(false);
+    Alert.alert(
+      'Report Post',
+      `Are you sure you want to report this post by ${post.userName}?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Report',
+          style: 'destructive',
+          onPress: () => {
+            // In a real app, you would send this to your backend
+            Alert.alert(
+              'Report Submitted',
+              'Thank you for your report. We will review this post and take appropriate action.',
+            );
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
@@ -74,9 +101,16 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
           <Icon name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Post Details</Text>
-        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Icon name="share" size={24} color="#007AFF" />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+            <Icon name="share" size={24} color="#007AFF" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.moreButton}
+            onPress={() => setShowMenu(true)}>
+            <Icon name="more-vert" size={24} color="#666" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -102,12 +136,22 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
         </View>
 
         {/* Post Image */}
-        <View style={styles.imageContainer}>
-          <View style={styles.postImage}>
-            <Icon name="image" size={60} color="#CCC" />
-            <Text style={styles.imagePlaceholder}>Post Image</Text>
+        {post.image ? (
+          <View style={styles.imageContainer}>
+            <Image
+              source={{uri: post.image}}
+              style={styles.postImage}
+              resizeMode="cover"
+            />
           </View>
-        </View>
+        ) : (
+          <View style={styles.imageContainer}>
+            <View style={styles.postImagePlaceholder}>
+              <Icon name="image" size={60} color="#CCC" />
+              <Text style={styles.imagePlaceholderText}>Post Image</Text>
+            </View>
+          </View>
+        )}
 
         {/* Post Content */}
         <View style={styles.contentSection}>
@@ -122,6 +166,36 @@ const PostDetailScreen: React.FC<PostDetailScreenProps> = ({route, navigation}) 
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Post Options Modal */}
+      <Modal
+        visible={showMenu}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowMenu(false)}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowMenu(false)}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={handleReport}>
+              <Icon name="flag" size={24} color="#FF3B30" />
+              <Text style={[styles.menuItemText, styles.reportText]}>
+                Report Post
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.menuItem, styles.cancelItem]}
+              onPress={() => setShowMenu(false)}>
+              <Text style={[styles.menuItemText, styles.cancelText]}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -157,7 +231,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   shareButton: {
+    padding: 4,
+    marginRight: 8,
+  },
+  moreButton: {
     padding: 4,
   },
   scrollView: {
@@ -222,11 +304,15 @@ const styles = StyleSheet.create({
   postImage: {
     width: '100%',
     height: '100%',
+  },
+  postImagePlaceholder: {
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F0F0F0',
   },
-  imagePlaceholder: {
+  imagePlaceholderText: {
     marginTop: 8,
     fontSize: 14,
     color: '#999',
@@ -257,6 +343,58 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginLeft: 6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    width: '80%',
+    maxWidth: 320,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  cancelItem: {
+    borderBottomWidth: 0,
+    justifyContent: 'center',
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 12,
+  },
+  reportText: {
+    color: '#FF3B30',
+  },
+  cancelText: {
+    color: '#666',
+    fontWeight: '600',
+    marginLeft: 0,
   },
 });
 
