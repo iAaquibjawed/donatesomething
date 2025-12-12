@@ -9,6 +9,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import {CommonActions} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   launchImageLibrary,
@@ -29,6 +30,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
     email: 'john.doe@example.com',
     phone: '+1 234 567 8900',
     profileImage: null as string | null,
+    accountType: 'provide' as 'want' | 'provide',
   });
 
   // Update user data if coming from EditProfileScreen
@@ -133,6 +135,29 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
               {userData.phone || 'Not provided'}
             </Text>
           </View>
+
+          {/* Account Type */}
+          <View style={styles.infoCard}>
+            <View style={styles.infoHeader}>
+              <Icon
+                name={
+                  userData.accountType === 'want'
+                    ? 'restaurant'
+                    : 'volunteer-activism'
+                }
+                size={20}
+                color="#007AFF"
+              />
+              <Text style={styles.infoLabel}>Account Type</Text>
+            </View>
+            <View style={styles.accountTypeBadge}>
+              <Text style={styles.accountTypeText}>
+                {userData.accountType === 'want'
+                  ? 'I Want Food'
+                  : 'I Provide Food'}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Action Buttons */}
@@ -157,7 +182,50 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
             <Icon name="chevron-right" size={24} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.actionButton, styles.logoutButton]}>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.logoutButton]}
+            onPress={() => {
+              Alert.alert(
+                'Logout',
+                'Are you sure you want to logout?',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Logout',
+                    style: 'destructive',
+                    onPress: () => {
+                      // Navigate to Auth screen (Login) - reset navigation stack
+                      // Get root navigator and reset to Auth
+                      const rootNavigation = navigation.getParent()?.getParent();
+                      if (rootNavigation) {
+                        rootNavigation.reset({
+                          index: 0,
+                          routes: [{name: 'Auth'}],
+                        });
+                      } else {
+                        // Fallback: try direct navigation
+                        navigation.dispatch(
+                          CommonActions.reset({
+                            index: 0,
+                            routes: [
+                              {
+                                name: 'Auth',
+                                state: {
+                                  routes: [{name: 'Login'}],
+                                },
+                              },
+                            ],
+                          }),
+                        );
+                      }
+                    },
+                  },
+                ],
+              );
+            }}>
             <Icon name="logout" size={20} color="#FF3B30" />
             <Text style={[styles.actionButtonText, styles.logoutText]}>
               Logout
@@ -294,6 +362,20 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     color: '#FF3B30',
+  },
+  accountTypeBadge: {
+    marginLeft: 28,
+    marginTop: 4,
+  },
+  accountTypeText: {
+    fontSize: 16,
+    color: '#007AFF',
+    fontWeight: '600',
+    backgroundColor: '#F0F8FF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
   },
 });
 
