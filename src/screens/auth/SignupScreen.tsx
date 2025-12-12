@@ -10,7 +10,9 @@ import {
   Platform,
   ScrollView,
   Alert,
+  StatusBar,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface SignupScreenProps {
@@ -18,6 +20,7 @@ interface SignupScreenProps {
 }
 
 const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
+  const insets = useSafeAreaInsets();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -104,6 +107,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
@@ -111,7 +115,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
-          <View style={styles.header}>
+          <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               style={styles.backButton}>
@@ -422,7 +426,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   header: {
-    marginTop: 20,
     marginBottom: 30,
   },
   backButton: {

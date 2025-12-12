@@ -7,13 +7,13 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaProvider, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Platform} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import HomeScreen from './src/screens/HomeScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
-import CreatePostScreen from './src/screens/CreatePostScreen';
 import PostDetailScreen from './src/screens/PostDetailScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import SignupScreen from './src/screens/auth/SignupScreen';
@@ -32,13 +32,14 @@ function MainAppNavigator() {
       <Stack.Screen name="MainTabs" component={MainTabsNavigator} />
       <Stack.Screen name="PostDetail" component={PostDetailScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-      <Stack.Screen name="CreatePost" component={CreatePostScreen} />
     </Stack.Navigator>
   );
 }
 
 // Tabs Navigator
 function MainTabsNavigator() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -46,9 +47,37 @@ function MainTabsNavigator() {
         tabBarInactiveTintColor: '#8E8E93',
         headerShown: false,
         tabBarStyle: {
-          height: 60,
-          paddingBottom: 8,
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#E5E5EA',
+          height: 60 + Math.max(insets.bottom, 0),
+          paddingBottom: Math.max(insets.bottom, 8),
           paddingTop: 8,
+          ...Platform.select({
+            ios: {
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: -2,
+              },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+            },
+            android: {
+              elevation: 8,
+            },
+          }),
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
+        },
+        tabBarItemStyle: {
+          paddingVertical: 4,
         },
       }}>
       <Tab.Screen
@@ -56,8 +85,9 @@ function MainTabsNavigator() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({color, size}) => (
-            <Icon name="home" size={size} color={color} />
+            <Icon name="home" size={24} color={color} />
           ),
+          tabBarLabel: 'Home',
         }}
       />
       <Tab.Screen
@@ -65,8 +95,9 @@ function MainTabsNavigator() {
         component={SearchScreen}
         options={{
           tabBarIcon: ({color, size}) => (
-            <Icon name="search" size={size} color={color} />
+            <Icon name="search" size={24} color={color} />
           ),
+          tabBarLabel: 'Search',
         }}
       />
       <Tab.Screen
@@ -74,8 +105,9 @@ function MainTabsNavigator() {
         component={ProfileScreen}
         options={{
           tabBarIcon: ({color, size}) => (
-            <Icon name="person" size={size} color={color} />
+            <Icon name="person" size={24} color={color} />
           ),
+          tabBarLabel: 'Profile',
         }}
       />
     </Tab.Navigator>

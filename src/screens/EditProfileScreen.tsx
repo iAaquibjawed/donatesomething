@@ -11,7 +11,9 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  StatusBar,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   launchImageLibrary,
@@ -39,6 +41,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
   route,
   navigation,
 }) => {
+  const insets = useSafeAreaInsets();
   const {userData: initialUserData} = route.params;
 
   const [firstName, setFirstName] = useState(initialUserData.firstName);
@@ -141,11 +144,12 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}>
@@ -398,10 +402,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+      ios: {
+        shadowOpacity: 0,
+      },
+    }),
   },
   backButton: {
     padding: 4,

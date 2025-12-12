@@ -8,7 +8,10 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  StatusBar,
+  Platform,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface SearchResult {
@@ -20,6 +23,7 @@ interface SearchResult {
 }
 
 const SearchScreen = () => {
+  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -163,8 +167,9 @@ const SearchScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       {/* Search Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
         <View style={styles.searchContainer}>
           <Icon name="search" size={24} color="#666" style={styles.searchIcon} />
           <TextInput
@@ -294,9 +299,17 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+      ios: {
+        shadowOpacity: 0,
+      },
+    }),
   },
   searchContainer: {
     flexDirection: 'row',

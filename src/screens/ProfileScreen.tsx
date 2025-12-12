@@ -8,8 +8,10 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  StatusBar,
+  Platform,
 } from 'react-native';
-import {CommonActions} from '@react-navigation/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   launchImageLibrary,
@@ -23,6 +25,8 @@ interface ProfileScreenProps {
 }
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
+  const insets = useSafeAreaInsets();
+
   // Dummy user data - in a real app, this would come from state management or API
   const [userData, setUserData] = useState({
     firstName: 'John',
@@ -93,12 +97,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, {paddingTop: Math.max(insets.top, 8)}]}>
           <Text style={styles.headerTitle}>Profile</Text>
         </View>
 
@@ -352,9 +357,17 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+      ios: {
+        shadowOpacity: 0,
+      },
+    }),
   },
   headerTitle: {
     fontSize: 28,
