@@ -3,13 +3,14 @@
  * @format
  */
 
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Platform, View, Text} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeScreen from './src/screens/HomeScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import NotificationScreen from './src/screens/NotificationScreen';
@@ -54,14 +55,8 @@ function MainTabsNavigator() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E5EA',
-          height: Platform.select({
-            ios: 60 + Math.max(insets.bottom, 0),
-            android: 65 + Math.max(insets.bottom, 16),
-          }),
-          paddingBottom: Platform.select({
-            ios: Math.max(insets.bottom, 0),
-            android: Math.max(insets.bottom, 16),
-          }),
+          height: 60 + Math.max(insets.bottom, 0),
+          paddingBottom: Math.max(insets.bottom, 8),
           paddingTop: 8,
           ...Platform.select({
             ios: {
@@ -80,24 +75,26 @@ function MainTabsNavigator() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '500',
-          marginTop: 2,
-          marginBottom: 0,
+          fontWeight: '600',
+          marginTop: 4,
         },
         tabBarIconStyle: {
-          marginTop: 0,
-          marginBottom: 0,
+          marginTop: 4,
         },
         tabBarItemStyle: {
-          paddingVertical: 6,
+          paddingVertical: 4,
         },
       }}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <Icon name="home" size={24} color={color} />
+          tabBarIcon: ({color, size, focused}) => (
+            <MaterialCommunityIcon
+              name={focused ? 'home-variant' : 'home-variant-outline'}
+              size={28}
+              color={color}
+            />
           ),
           tabBarLabel: 'Home',
         }}
@@ -106,8 +103,12 @@ function MainTabsNavigator() {
         name="Search"
         component={SearchScreen}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <Icon name="search" size={24} color={color} />
+          tabBarIcon: ({color, size, focused}) => (
+            <MaterialCommunityIcon
+              name={focused ? 'magnify' : 'magnify'}
+              size={28}
+              color={color}
+            />
           ),
           tabBarLabel: 'Search',
         }}
@@ -117,21 +118,25 @@ function MainTabsNavigator() {
         component={NotificationScreen}
         options={{
           tabBarIcon: ({color, size, focused}) => (
-            <View style={{position: 'relative', width: 24, height: 24}}>
-              <Icon name="notifications" size={24} color={color} />
+            <View style={{position: 'relative', width: 28, height: 28}}>
+              <MaterialCommunityIcon
+                name={focused ? 'bell' : 'bell-outline'}
+                size={28}
+                color={color}
+              />
               {unreadCount > 0 && (
                 <View
                   style={{
                     position: 'absolute',
-                    top: -6,
-                    right: -8,
+                    top: -4,
+                    right: -6,
                     backgroundColor: '#FF3B30',
-                    borderRadius: unreadCount > 9 ? 8 : 9,
-                    minWidth: unreadCount > 9 ? 18 : 18,
-                    height: 18,
+                    borderRadius: unreadCount > 9 ? 9 : 10,
+                    minWidth: unreadCount > 9 ? 20 : 20,
+                    height: 20,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    paddingHorizontal: unreadCount > 9 ? 4 : 0,
+                    paddingHorizontal: unreadCount > 9 ? 5 : 0,
                     borderWidth: 2,
                     borderColor: '#FFFFFF',
                   }}>
@@ -154,8 +159,12 @@ function MainTabsNavigator() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <Icon name="person" size={24} color={color} />
+          tabBarIcon: ({color, size, focused}) => (
+            <MaterialCommunityIcon
+              name={focused ? 'account-circle' : 'account-circle-outline'}
+              size={28}
+              color={color}
+            />
           ),
           tabBarLabel: 'Profile',
         }}
