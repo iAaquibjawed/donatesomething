@@ -12,6 +12,7 @@ import {Platform, View, Text, StatusBar} from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ThemeProvider, useTheme} from './src/context/ThemeContext';
+import {UserProvider} from './src/context/UserContext';
 import HomeScreen from './src/screens/HomeScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import NotificationScreen from './src/screens/NotificationScreen';
@@ -19,6 +20,8 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import PostDetailScreen from './src/screens/PostDetailScreen';
 import CreatePostScreen from './src/screens/CreatePostScreen';
+import FollowingScreen from './src/screens/FollowingScreen';
+import FollowersScreen from './src/screens/FollowersScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import SignupScreen from './src/screens/auth/SignupScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
@@ -169,10 +172,12 @@ function MainAppNavigator() {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="MainTabs" component={MainTabsNavigator} />
-      <Stack.Screen name="PostDetail" component={PostDetailScreen} />
-      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-      <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+              <Stack.Screen name="MainTabs" component={MainTabsNavigator} />
+              <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+              <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+              <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+              <Stack.Screen name="Following" component={FollowingScreen} />
+              <Stack.Screen name="Followers" component={FollowersScreen} />
     </Stack.Navigator>
   );
 }
@@ -260,11 +265,13 @@ function AppContent(): React.JSX.Element {
   );
 }
 
-// Root App component with ThemeProvider
+// Root App component with ThemeProvider and UserProvider
 function App(): React.JSX.Element {
   return (
     <ThemeProvider>
-      <AppContent />
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
     </ThemeProvider>
   );
 }

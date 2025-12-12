@@ -16,6 +16,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '../context/ThemeContext';
+import {useUser} from '../context/UserContext';
 
 interface Post {
   id: number;
@@ -31,30 +32,31 @@ interface Post {
 
 interface HomeScreenProps {
   navigation: any;
+  route?: {
+    params?: {
+      accountType?: 'want' | 'provide';
+      following?: Set<string>;
+    };
+  };
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
   const {colors, isDark} = useTheme();
-  // Track which users are being followed
-  const [following, setFollowing] = useState<Set<number>>(new Set());
+  const {accountType: currentAccountType, following, addFollowing, removeFollowing} = useUser();
   // Track which post's menu is open
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
-  const handleFollow = (postId: number, userName: string, e: any) => {
+  const handleFollow = (userName: string, e: any) => {
     e.stopPropagation(); // Prevent navigation when clicking follow button
 
-    setFollowing(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-        Alert.alert('Unfollowed', `You unfollowed ${userName}`);
-      } else {
-        newSet.add(postId);
-        Alert.alert('Following', `You are now following ${userName}`);
-      }
-      return newSet;
-    });
+    if (following.has(userName)) {
+      removeFollowing(userName);
+      Alert.alert('Unfollowed', `You unfollowed ${userName}`);
+    } else {
+      addFollowing(userName);
+      Alert.alert('Following', `You are now following ${userName}`);
+    }
   };
 
   const handleShare = async (post: Post) => {
@@ -133,7 +135,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     setSelectedPostId(null);
   };
 
-  const posts: Post[] = [
+  const allPosts: Post[] = [
     {
       id: 1,
       userName: 'Sarah Johnson',
@@ -208,6 +210,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     },
   ];
 
+  // Filter posts based on account type
+  // For "I Want Food" users: only show posts from users they're following
+  // For "I Provide Food" users: show all posts
+  const posts =
+    currentAccountType === 'want'
+      ? allPosts.filter(post => following.has(post.userName))
+      : allPosts;
+
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]} edges={['top', 'left', 'right']}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} translucent={false} />
@@ -222,7 +232,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         style={styles.feed}
         contentContainerStyle={[styles.feedContent, {paddingBottom: Math.max(insets.bottom, 0) + 80}]}
         showsVerticalScrollIndicator={false}>
-        {posts.map(post => (
+        {currentAccountType === 'want' && following.size === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Icon name="people-outline" size={64} color={colors.textSecondary} />
+            <Text style={[styles.emptyText, {color: colors.text}]}>No posts to show</Text>
+            <Text style={[styles.emptySubtext, {color: colors.textSecondary}]}>
+              Start following food providers to see their posts
+            </Text>
+          </View>
+        ) : posts.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Icon name="article" size={64} color={colors.textSecondary} />
+            <Text style={[styles.emptyText, {color: colors.text}]}>No posts available</Text>
+          </View>
+        ) : (
+          posts.map(post => (
           <TouchableOpacity
             key={post.id}
             style={[styles.post, {backgroundColor: colors.surface, borderColor: colors.border}]}
@@ -238,21 +262,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                   <Text style={[styles.userName, {color: colors.text}]} numberOfLines={1}>
                     {post.userName}
                   </Text>
-                  <TouchableOpacity
-                    style={[
-                      styles.followButton,
-                      following.has(post.id) && styles.followingButton,
-                    ]}
-                    onPress={e => handleFollow(post.id, post.userName, e)}
-                    activeOpacity={0.7}>
-                    <Text
+                  {currentAccountType === 'want' && (
+                    <TouchableOpacity
                       style={[
-                        styles.followButtonText,
-                        following.has(post.id) && styles.followingButtonText,
-                      ]}>
-                      {following.has(post.id) ? 'Following' : 'Follow'}
-                    </Text>
-                  </TouchableOpacity>
+                        styles.followButton,
+                        following.has(post.userName) && styles.followingButton,
+                      ]}
+                      onPress={e => handleFollow(post.userName, e)}
+                      activeOpacity={0.7}>
+                      <Text
+                        style={[
+                          styles.followButtonText,
+                          following.has(post.userName) && styles.followingButtonText,
+                        ]}>
+                        {following.has(post.userName) ? 'Following' : 'Follow'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity
                     style={styles.moreButton}
                     onPress={e => handleMoreOptions(post.id, e)}>
@@ -295,7 +321,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
-        ))}
+          ))
+        )}
       </ScrollView>
 
       {/* Post Options Modal */}
@@ -501,6 +528,21 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     marginLeft: 6,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
